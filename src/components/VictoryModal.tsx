@@ -3,6 +3,7 @@ import { Star, X, Share2, Award, Camera } from 'lucide-react';
 import type { PhotoMission, MissionState } from '../types';
 import { getRank } from '../data/missions';
 import confetti from 'canvas-confetti';
+import { useLanguage } from '../i18n/LanguageContext';
 
 interface VictoryModalProps {
   isOpen: boolean;
@@ -21,19 +22,41 @@ export const VictoryModal: React.FC<VictoryModalProps> = ({
   missions,
   onOpenPhotoPreview,
 }) => {
+  const { language, t } = useLanguage();
   const currentRank = getRank(totalStars);
+
+  const rankTitle =
+    language === 'en' && currentRank.titleEn
+      ? currentRank.titleEn
+      : language === 'zh' && currentRank.titleZh
+      ? currentRank.titleZh
+      : currentRank.title;
+
+  const rankDesc =
+    language === 'en' && currentRank.descriptionEn
+      ? currentRank.descriptionEn
+      : language === 'zh' && currentRank.descriptionZh
+      ? currentRank.descriptionZh
+      : currentRank.description;
 
   // Collect all photos from all missions
   const allPhotos: { url: string; title: string; stars: number }[] = [];
   missions.forEach((m) => {
     const state = missionStates[m.id];
     if (state?.photos && state.photos.length > 0) {
+      const missionTitle =
+        language === 'en' && m.titleEn
+          ? m.titleEn
+          : language === 'zh' && m.titleZh
+          ? m.titleZh
+          : m.title;
+
       state.photos.forEach((p) => {
         const u = p.url || p.dataUrl;
         if (u) {
           allPhotos.push({
             url: u,
-            title: m.title,
+            title: missionTitle,
             stars: state.stars,
           });
         }
@@ -74,7 +97,7 @@ export const VictoryModal: React.FC<VictoryModalProps> = ({
   if (!isOpen) return null;
 
   const handleShare = async () => {
-    const text = `🎉 TripTales Phichit Adventure: ครอบครัวเราสะสมได้ ${totalStars} ดาว และเก็บภาพความทรงจำได้ ${allPhotos.length} รูป! ได้รับฉายา ${currentRank.badge} ${currentRank.title}!`;
+    const text = `🎉 TripTales: ${t('statStars')}: ${totalStars}★, ${t('statPhotos')}: ${allPhotos.length}, ${rankTitle}!`;
     if (navigator.share) {
       try {
         await navigator.share({
@@ -105,32 +128,32 @@ export const VictoryModal: React.FC<VictoryModalProps> = ({
           <div className="text-5xl mb-2 drop-shadow-md animate-bounce">{currentRank.badge}</div>
 
           <h2 className="text-xl font-black tracking-tight text-white">
-            🎉 สรุปผลการผจญภัย TripTales!
+            {completedCount >= missions.length ? t('victoryAllDoneTitle') : t('victoryTitle')}
           </h2>
           <p className="text-amber-100 text-xs font-medium mt-1">
-            Phichit Adventure 2026 • Plan the trip. Capture the memories.
+            {t('victorySubtitle')}
           </p>
 
           {/* Stats Badges */}
           <div className="mt-4 grid grid-cols-3 gap-2 bg-white/15 backdrop-blur-md rounded-2xl p-3 border border-white/20">
             <div>
-              <div className="text-[10px] text-amber-200 uppercase font-semibold">คะแนนดาว</div>
+              <div className="text-[10px] text-amber-200 uppercase font-semibold">{t('statStars')}</div>
               <div className="text-base font-black text-yellow-300 flex items-center justify-center gap-1">
                 <Star className="w-4 h-4 fill-yellow-300" />
                 <span>{totalStars}</span>
               </div>
             </div>
             <div>
-              <div className="text-[10px] text-amber-200 uppercase font-semibold">ภารกิจสำเร็จ</div>
+              <div className="text-[10px] text-amber-200 uppercase font-semibold">{t('statCompleted')}</div>
               <div className="text-base font-black text-white">
                 {completedCount} / {missions.length}
               </div>
             </div>
             <div>
-              <div className="text-[10px] text-amber-200 uppercase font-semibold">รูปที่บันทึก</div>
+              <div className="text-[10px] text-amber-200 uppercase font-semibold">{t('statPhotos')}</div>
               <div className="text-base font-black text-white flex items-center justify-center gap-1">
                 <Camera className="w-3.5 h-3.5" />
-                <span>{allPhotos.length} รูป</span>
+                <span>{t('photoCount', { count: allPhotos.length })}</span>
               </div>
             </div>
           </div>
@@ -142,20 +165,20 @@ export const VictoryModal: React.FC<VictoryModalProps> = ({
           <div className="bg-amber-50/70 border-2 border-dashed border-amber-300 rounded-2xl p-4 text-center">
             <div className="inline-flex items-center gap-1.5 bg-amber-200/80 text-amber-900 text-xs font-bold px-3 py-1 rounded-full mb-2">
               <Award className="w-3.5 h-3.5 text-amber-700" />
-              <span>เกียรติบัตรนักผจญภัย</span>
+              <span>{t('certBadge')}</span>
             </div>
             <h3 className="text-lg font-black text-slate-800">
-              {currentRank.badge} {currentRank.title}
+              {currentRank.badge} {rankTitle}
             </h3>
             <p className="text-xs text-slate-600 mt-1 max-w-xs mx-auto">
-              "{currentRank.description}"
+              "{rankDesc}"
             </p>
           </div>
 
           {/* Photo Gallery Scrapbook */}
           <div>
             <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wide mb-2">
-              📸 อัลบั้มภาพถ่ายความทรงจำ ({allPhotos.length} รูป)
+              {t('scrapbookTitle', { count: allPhotos.length })}
             </h4>
 
             {allPhotos.length > 0 ? (
@@ -182,7 +205,7 @@ export const VictoryModal: React.FC<VictoryModalProps> = ({
               </div>
             ) : (
               <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 text-center text-xs text-slate-500">
-                ยังไม่มีรูปถ่ายในระบบ ถ่ายรูปภารกิจแล้วรูปจะปรากฏที่นี่ครับ!
+                {t('noPhotosYet')}
               </div>
             )}
           </div>
@@ -194,13 +217,13 @@ export const VictoryModal: React.FC<VictoryModalProps> = ({
               className="flex-1 py-2.5 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs transition-all cursor-pointer"
             >
               <Share2 className="w-4 h-4" />
-              <span>แชร์ความสำเร็จ</span>
+              <span>{t('shareResult')}</span>
             </button>
             <button
               onClick={onClose}
               className="py-2.5 px-5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-all cursor-pointer"
             >
-              ปิดหน้าต่าง
+              {t('close')}
             </button>
           </div>
         </div>

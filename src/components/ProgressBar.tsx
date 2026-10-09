@@ -1,6 +1,7 @@
 import React from 'react';
 import { Star, Award, Sparkles } from 'lucide-react';
 import { getRank } from '../data/missions';
+import { useLanguage } from '../i18n/LanguageContext';
 
 interface ProgressBarProps {
   totalStars: number;
@@ -15,9 +16,24 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
   totalMissions,
   onOpenVictory,
 }) => {
+  const { language, t } = useLanguage();
   const currentRank = getRank(totalStars);
   const maxStars = Math.max(22, totalMissions * 3);
   const progressPercent = Math.min(100, Math.round((totalStars / maxStars) * 100));
+
+  const rankTitle =
+    language === 'en' && currentRank.titleEn
+      ? currentRank.titleEn
+      : language === 'zh' && currentRank.titleZh
+      ? currentRank.titleZh
+      : currentRank.title;
+
+  const rankDesc =
+    language === 'en' && currentRank.descriptionEn
+      ? currentRank.descriptionEn
+      : language === 'zh' && currentRank.descriptionZh
+      ? currentRank.descriptionZh
+      : currentRank.description;
 
   return (
     <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 rounded-3xl p-4 text-white shadow-md shadow-orange-500/15 mb-4 relative overflow-hidden">
@@ -30,13 +46,13 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
         <div>
           <div className="flex items-center gap-1.5 text-amber-100 text-xs font-semibold uppercase tracking-wider">
             <Sparkles className="w-3.5 h-3.5 text-yellow-200" />
-            <span>ภารกิจตามล่าภาพถ่าย</span>
+            <span>{t('scavengerTitle')}</span>
           </div>
           <div className="flex items-baseline gap-2 mt-0.5">
             <div className="flex items-center gap-1">
               <Star className="w-6 h-6 fill-yellow-300 text-yellow-300 drop-shadow-xs" />
               <span className="text-2xl font-black tracking-tight">{totalStars}</span>
-              <span className="text-amber-200 text-sm font-semibold">/ {maxStars} ดาว</span>
+              <span className="text-amber-200 text-sm font-semibold">/ {maxStars} {t('stars')}</span>
             </div>
           </div>
         </div>
@@ -48,8 +64,8 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
         >
           <span className="text-2xl">{currentRank.badge}</span>
           <div>
-            <div className="text-[10px] text-amber-100 font-medium leading-none">ฉายาปัจจุบัน</div>
-            <div className="text-xs font-bold text-white leading-tight mt-0.5">{currentRank.title}</div>
+            <div className="text-[10px] text-amber-100 font-medium leading-none">{t('rankPrefix')}</div>
+            <div className="text-xs font-bold text-white leading-tight mt-0.5">{rankTitle}</div>
           </div>
         </button>
       </div>
@@ -57,7 +73,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
       {/* Progress Bars */}
       <div className="space-y-1.5 relative z-10">
         <div className="flex justify-between items-center text-xs font-medium text-amber-100">
-          <span>ความสำเร็จ: {completedCount} / {totalMissions} ภารกิจ</span>
+          <span>{t('completedMissions', { count: completedCount, total: totalMissions })}</span>
           <span className="font-bold text-white">{progressPercent}%</span>
         </div>
 
@@ -71,14 +87,14 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
 
       {/* Quick encouragement note */}
       <div className="mt-2.5 pt-2 border-t border-white/15 flex items-center justify-between text-[11px] text-amber-100 relative z-10">
-        <span>{currentRank.description}</span>
+        <span>{rankDesc}</span>
         {totalStars >= maxStars ? (
           <span className="font-bold text-yellow-200 flex items-center gap-1">
-            <Award className="w-3.5 h-3.5" /> ชนะครบแล้ว!
+            <Award className="w-3.5 h-3.5" /> {t('allMissionsCompleted')}
           </span>
         ) : (
           <span className="text-amber-200">
-            อีก {Math.max(0, maxStars - totalStars)} ดาว สู่ตำแหน่ง Master!
+            {t('starsToMaster', { count: Math.max(0, maxStars - totalStars) })}
           </span>
         )}
       </div>

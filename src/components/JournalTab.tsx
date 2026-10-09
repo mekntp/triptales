@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import type { TripJournal } from '../types';
 import { BookOpen, Save, CheckCircle2, Calendar } from 'lucide-react';
+import { useLanguage } from '../i18n/LanguageContext';
 
 interface JournalTabProps {
   currentJournal: TripJournal;
@@ -8,22 +9,23 @@ interface JournalTabProps {
   onSaveJournal: (journal: TripJournal) => void;
 }
 
-const MOODS = [
-  { emoji: '😄', label: 'สนุกมาก' },
-  { emoji: '🚀', label: 'ตื่นเต้น' },
-  { emoji: '🐊', label: 'ประทับใจ' },
-  { emoji: '🍦', label: 'อิ่มอร่อย' },
-  { emoji: '😴', label: 'หมดพลัง' },
-];
-
 export const JournalTab: React.FC<JournalTabProps> = ({
   currentJournal,
   allJournals,
   onSaveJournal,
 }) => {
+  const { t } = useLanguage();
   const [note, setNote] = useState(currentJournal.note || '');
   const [selectedMood, setSelectedMood] = useState(currentJournal.mood || '😄');
   const [isSaved, setIsSaved] = useState(false);
+
+  const MOODS = [
+    { emoji: '😄', labelKey: 'moodGreat' },
+    { emoji: '🚀', labelKey: 'moodExcited' },
+    { emoji: '🐊', labelKey: 'moodImpressed' },
+    { emoji: '🍦', labelKey: 'moodYummy' },
+    { emoji: '😴', labelKey: 'moodTired' },
+  ] as const;
 
   const handleSave = () => {
     onSaveJournal({
@@ -42,10 +44,10 @@ export const JournalTab: React.FC<JournalTabProps> = ({
       <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 rounded-3xl p-4 text-white shadow-md shadow-orange-500/15">
         <div className="flex items-center gap-2 mb-1">
           <BookOpen className="w-5 h-5 text-yellow-200" />
-          <h3 className="font-black text-base">ความทรงจำวันนี้ (Trip Journal)</h3>
+          <h3 className="font-black text-base">{t('journalTitle')}</h3>
         </div>
         <p className="text-xs text-amber-100">
-          บันทึกเรื่องราวสั้นๆ ความประทับใจ หรือคำพูดน่ารักๆ ของลูกในวันนี้
+          {t('journalDesc')}
         </p>
       </div>
 
@@ -54,7 +56,7 @@ export const JournalTab: React.FC<JournalTabProps> = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5 text-xs font-bold text-slate-700">
             <Calendar className="w-4 h-4 text-amber-600" />
-            <span>วันที่: {currentJournal.date}</span>
+            <span>{t('journalDate', { date: currentJournal.date })}</span>
           </div>
 
           {/* Mood Picker */}
@@ -68,7 +70,7 @@ export const JournalTab: React.FC<JournalTabProps> = ({
                     ? 'bg-amber-100 border border-amber-300 scale-110'
                     : 'opacity-60 hover:opacity-100'
                 }`}
-                title={m.label}
+                title={t(m.labelKey)}
               >
                 {m.emoji}
               </button>
@@ -79,13 +81,13 @@ export const JournalTab: React.FC<JournalTabProps> = ({
         {/* Text Area */}
         <div>
           <label className="block text-xs font-bold text-slate-700 mb-1.5">
-            บันทึกความทรงจำของครอบครัว:
+            {t('journalNoteLabel')}
           </label>
           <textarea
             rows={5}
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            placeholder="เช่น วันนี้ลูกตื่นเต้นมากที่ได้เห็นจระเข้ยักษ์พญาชาละวัน และกินไอศกรีมด้วยกันอย่างมีความสุข..."
+            placeholder={t('journalPlaceholder')}
             className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-3 text-xs text-slate-800 focus:ring-2 focus:ring-amber-500 focus:outline-none resize-none leading-relaxed"
           />
         </div>
@@ -95,10 +97,10 @@ export const JournalTab: React.FC<JournalTabProps> = ({
           <div className="text-[11px] text-slate-400">
             {isSaved ? (
               <span className="text-emerald-600 font-bold flex items-center gap-1">
-                <CheckCircle2 className="w-3.5 h-3.5" /> บันทึกเรียบร้อย!
+                <CheckCircle2 className="w-3.5 h-3.5" /> {t('savedNotice')}
               </span>
             ) : (
-              <span>บันทึกทั้งในเครื่อง & คลาวด์</span>
+              <span>{t('offlineNotice')}</span>
             )}
           </div>
 
@@ -107,7 +109,7 @@ export const JournalTab: React.FC<JournalTabProps> = ({
             className="py-2.5 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 active:scale-95 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs cursor-pointer transition-all"
           >
             <Save className="w-3.5 h-3.5" />
-            <span>บันทึก</span>
+            <span>{t('save')}</span>
           </button>
         </div>
       </div>
@@ -116,7 +118,7 @@ export const JournalTab: React.FC<JournalTabProps> = ({
       {allJournals.length > 1 && (
         <div className="space-y-2 pt-2">
           <div className="text-xs font-bold text-slate-700 uppercase px-1">
-            บันทึกวันก่อนหน้า ({allJournals.length})
+            {t('previousEntries', { count: allJournals.length })}
           </div>
 
           <div className="space-y-2">

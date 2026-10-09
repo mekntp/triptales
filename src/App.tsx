@@ -26,8 +26,10 @@ import {
   syncJournalToSupabase,
   getSupabaseClient,
 } from './lib/supabase';
+import { useLanguage } from './i18n/LanguageContext';
 
 export function App() {
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState<ActiveTab>('places');
 
   // Places itinerary state (persisted)
@@ -224,7 +226,7 @@ export function App() {
   const handleSyncToSupabase = async () => {
     const client = getSupabaseClient();
     if (!client) {
-      alert('กรุณากรอก Supabase URL และ Anon Key ในการตั้งค่าก่อนครับ');
+      alert(t('supabaseSection'));
       return;
     }
 
@@ -258,9 +260,9 @@ export function App() {
         await syncJournalToSupabase(currentJournal);
       }
 
-      alert('ซิงค์ข้อมูลทริปขึ้น Supabase Cloud สำเร็จเรียบร้อยครับ!');
+      alert(t('settingsSaved'));
     } catch (err) {
-      alert('เกิดข้อผิดพลาดในการซิงค์: ' + (err as Error).message);
+      alert((err as Error).message);
     } finally {
       setIsSyncing(false);
     }
@@ -325,11 +327,7 @@ export function App() {
 
   // Reset all data
   const handleResetAllData = async () => {
-    if (
-      window.confirm(
-        'คุณแน่ใจหรือไม่ว่าต้องการรีเซ็ตข้อมูลทริปทั้งหมด? รูปถ่ายและประวัติจะถูกลบ'
-      )
-    ) {
+    if (window.confirm(t('resetConfirm'))) {
       await clearAllLocalData();
       localStorage.removeItem('triptales_places');
       localStorage.removeItem('triptales_mission_states');
@@ -346,7 +344,7 @@ export function App() {
       });
       setAllJournals([]);
       setIsSettingsOpen(false);
-      alert('รีเซ็ตข้อมูลเรียบร้อยแล้ว พร้อมเริ่มการเดินทางใหม่!');
+      alert(t('resetSuccess'));
     }
   };
 

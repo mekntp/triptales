@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import type { Place, PlaceStatus } from '../types';
 import { X, Save, Trash2, MapPin, Sparkles } from 'lucide-react';
+import { useLanguage } from '../i18n/LanguageContext';
 
 interface EditPlaceModalProps {
   isOpen: boolean;
@@ -19,6 +20,7 @@ export const EditPlaceModal: React.FC<EditPlaceModalProps> = ({
   onSave,
   onDelete,
 }) => {
+  const { t } = useLanguage();
   const isEditing = !!place;
 
   const [formData, setFormData] = useState<Partial<Place>>(() => {
@@ -47,7 +49,7 @@ export const EditPlaceModal: React.FC<EditPlaceModalProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name?.trim()) {
-      alert('กรุณากรอกชื่อสถานที่ครับ');
+      alert(t('nameLabel'));
       return;
     }
 
@@ -89,7 +91,7 @@ export const EditPlaceModal: React.FC<EditPlaceModalProps> = ({
           <div className="flex items-center gap-2">
             <MapPin className="w-5 h-5 text-amber-600" />
             <h3 className="font-bold text-slate-800 text-base">
-              {isEditing ? 'แก้ไขสถานที่' : 'เพิ่มสถานที่ใหม่'}
+              {isEditing ? t('editPlaceTitle') : t('addPlaceTitle')}
             </h3>
           </div>
           <button
@@ -103,7 +105,7 @@ export const EditPlaceModal: React.FC<EditPlaceModalProps> = ({
         <form onSubmit={handleSubmit} className="p-5 space-y-4 text-xs">
           {/* Icon Selector */}
           <div>
-            <label className="block text-slate-600 font-semibold mb-1">ไอคอนประจำจุด:</label>
+            <label className="block text-slate-600 font-semibold mb-1">{t('iconLabel')}</label>
             <div className="flex flex-wrap gap-1.5 mb-2">
               {COMMON_ICONS.map((icon) => (
                 <button
@@ -125,38 +127,38 @@ export const EditPlaceModal: React.FC<EditPlaceModalProps> = ({
           {/* Place Name */}
           <div>
             <label className="block text-slate-600 font-semibold mb-1">
-              ชื่อสถานที่ <span className="text-rose-500">*</span>:
+              {t('nameLabel')} <span className="text-rose-500">*</span>:
             </label>
             <input
               type="text"
               required
               value={formData.name || ''}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              placeholder="เช่น บึงสีไฟ หรือ วัดท่าหลวง"
+              placeholder={t('namePlaceholder')}
               className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-slate-800 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none"
             />
           </div>
 
           {/* Subtitle */}
           <div>
-            <label className="block text-slate-600 font-semibold mb-1">คำโปรยสั้นๆ:</label>
+            <label className="block text-slate-600 font-semibold mb-1">{t('subtitleLabel')}</label>
             <input
               type="text"
               value={formData.subtitle || ''}
               onChange={(e) => setFormData({ ...formData, subtitle: e.target.value })}
-              placeholder="เช่น จระเข้ยักษ์ & ลานวิ่งเล่นกว้าง"
+              placeholder={t('subtitlePlaceholder')}
               className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-800 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none"
             />
           </div>
 
           {/* Description */}
           <div>
-            <label className="block text-slate-600 font-semibold mb-1">รายละเอียด:</label>
+            <label className="block text-slate-600 font-semibold mb-1">{t('descLabel')}</label>
             <textarea
               rows={3}
               value={formData.description || ''}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder="เล่าไฮไลต์หรือกิจกรรมสำหรับครอบครัว..."
+              placeholder={t('descPlaceholder')}
               className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-800 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none resize-none"
             />
           </div>
@@ -164,7 +166,7 @@ export const EditPlaceModal: React.FC<EditPlaceModalProps> = ({
           {/* GPS Coordinates */}
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <label className="block text-slate-600 font-semibold mb-1">ละติจูด (Lat):</label>
+              <label className="block text-slate-600 font-semibold mb-1">{t('latLabel')}</label>
               <input
                 type="number"
                 step="any"
@@ -180,7 +182,7 @@ export const EditPlaceModal: React.FC<EditPlaceModalProps> = ({
               />
             </div>
             <div>
-              <label className="block text-slate-600 font-semibold mb-1">ลองจิจูด (Lng):</label>
+              <label className="block text-slate-600 font-semibold mb-1">{t('lngLabel')}</label>
               <input
                 type="number"
                 step="any"
@@ -199,12 +201,12 @@ export const EditPlaceModal: React.FC<EditPlaceModalProps> = ({
 
           {/* Tags */}
           <div>
-            <label className="block text-slate-600 font-semibold mb-1">แท็ก (คั่นด้วยจุลภาค ,):</label>
+            <label className="block text-slate-600 font-semibold mb-1">{t('tagsLabel')}</label>
             <input
               type="text"
               value={tagInput}
               onChange={(e) => setTagInput(e.target.value)}
-              placeholder="จระเข้, แอร์เย็น, ของอร่อย"
+              placeholder={t('tagsPlaceholder')}
               className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-800 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none"
             />
           </div>
@@ -213,7 +215,7 @@ export const EditPlaceModal: React.FC<EditPlaceModalProps> = ({
           <div className="flex items-center justify-between p-2.5 bg-amber-50 rounded-xl border border-amber-200">
             <div className="flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-amber-600" />
-              <span className="font-bold text-amber-950">จุดนี้เด็กชอบมากเป็นพิเศษ</span>
+              <span className="font-bold text-amber-950">{t('kidsFavoriteLabel')}</span>
             </div>
             <input
               type="checkbox"
@@ -230,20 +232,20 @@ export const EditPlaceModal: React.FC<EditPlaceModalProps> = ({
               className="flex-1 py-2.5 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs transition-all cursor-pointer active:scale-95"
             >
               <Save className="w-4 h-4" />
-              <span>{isEditing ? 'บันทึกการแก้ไข' : 'เพิ่มสถานที่'}</span>
+              <span>{isEditing ? t('savePlace') : t('addPlaceTitle')}</span>
             </button>
 
             {isEditing && onDelete && (
               <button
                 type="button"
                 onClick={() => {
-                  if (confirm(`ต้องการลบ "${formData.name}" หรือไม่?`)) {
+                  if (confirm(`${t('deletePlace')}: "${formData.name}"?`)) {
                     onDelete(formData.id!);
                     onClose();
                   }
                 }}
                 className="p-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 cursor-pointer"
-                title="ลบสถานที่นี้"
+                title={t('deletePlace')}
               >
                 <Trash2 className="w-4 h-4" />
               </button>
@@ -254,7 +256,7 @@ export const EditPlaceModal: React.FC<EditPlaceModalProps> = ({
               onClick={onClose}
               className="py-2.5 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-all cursor-pointer"
             >
-              ยกเลิก
+              {t('cancel')}
             </button>
           </div>
         </form>

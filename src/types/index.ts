@@ -4,9 +4,15 @@ export interface Place {
   id: string;
   tripId?: string;
   name: string;
+  nameEn?: string;
+  nameZh?: string;
   icon: string;
   subtitle: string;
+  subtitleEn?: string;
+  subtitleZh?: string;
   description: string;
+  descriptionEn?: string;
+  descriptionZh?: string;
   tags: string[];
   googleMapsUrl: string;
   latitude?: number;
@@ -30,8 +36,12 @@ export interface PhotoMission {
   tripId?: string;
   placeId?: string;
   title: string;
+  titleEn?: string;
+  titleZh?: string;
   icon: string;
   hint: string;
+  hintEn?: string;
+  hintZh?: string;
   isBonus?: boolean;
 }
 
@@ -65,8 +75,12 @@ export interface RankInfo {
   minStars: number;
   maxStars: number;
   title: string;
+  titleEn?: string;
+  titleZh?: string;
   badge: string;
   description: string;
+  descriptionEn?: string;
+  descriptionZh?: string;
   color: string;
 }
 

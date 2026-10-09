@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import type { Place, RouteSummary } from '../types';
 import { MapPin, Navigation, Maximize2, Minimize2, ExternalLink } from 'lucide-react';
-import { formatDurationThai, generateGoogleMapsDirectionsUrl } from '../lib/route';
+import { generateGoogleMapsDirectionsUrl } from '../lib/route';
+import { useLanguage } from '../i18n/LanguageContext';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -18,6 +19,7 @@ export const RouteMap: React.FC<RouteMapProps> = ({
   selectedPlaceId,
   onSelectPlace,
 }) => {
+  const { language, t, formatDuration } = useLanguage();
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
   const markersRef = useRef<L.Marker[]>([]);
@@ -78,6 +80,20 @@ export const RouteMap: React.FC<RouteMapProps> = ({
         const isVisited = place.status === 'visited';
         const isSelected = selectedPlaceId === place.id;
 
+        const placeName =
+          language === 'en' && place.nameEn
+            ? place.nameEn
+            : language === 'zh' && place.nameZh
+            ? place.nameZh
+            : place.name;
+
+        const placeSub =
+          language === 'en' && place.subtitleEn
+            ? place.subtitleEn
+            : language === 'zh' && place.subtitleZh
+            ? place.subtitleZh
+            : place.subtitle || '';
+
         // Custom HTML Marker with number and icon
         const iconHtml = `
           <div style="
@@ -115,9 +131,9 @@ export const RouteMap: React.FC<RouteMapProps> = ({
 
         marker.bindPopup(`
           <div style="font-family: inherit; min-width: 140px; padding: 2px;">
-            <div style="font-size: 11px; font-weight: 700; color: #64748b;">จุดที่ ${index + 1}</div>
-            <div style="font-size: 13px; font-weight: 800; color: #0f172a; margin-top: 1px;">${place.name}</div>
-            <div style="font-size: 11px; color: #475569; margin-top: 2px;">${place.subtitle || ''}</div>
+            <div style="font-size: 11px; font-weight: 700; color: #64748b;">#${index + 1}</div>
+            <div style="font-size: 13px; font-weight: 800; color: #0f172a; margin-top: 1px;">${placeName}</div>
+            <div style="font-size: 11px; color: #475569; margin-top: 2px;">${placeSub}</div>
             <a href="${place.googleMapsUrl}" target="_blank" rel="noopener noreferrer" style="
               display: inline-flex;
               align-items: center;
@@ -128,7 +144,7 @@ export const RouteMap: React.FC<RouteMapProps> = ({
               color: #2563eb;
               text-decoration: none;
             ">
-              เปิด Google Maps ↗
+              Google Maps ↗
             </a>
           </div>
         `);
@@ -163,7 +179,7 @@ export const RouteMap: React.FC<RouteMapProps> = ({
       console.warn('Leaflet map error, switching to fallback UI:', err);
       setHasMapError(true);
     }
-  }, [places, selectedPlaceId, isExpanded, onSelectPlace]);
+  }, [places, selectedPlaceId, isExpanded, onSelectPlace, language]);
 
   // Clean up
   useEffect(() => {
@@ -186,13 +202,13 @@ export const RouteMap: React.FC<RouteMapProps> = ({
             🗺️
           </div>
           <div>
-            <h4 className="text-xs font-bold text-slate-800 leading-tight">แผนที่เส้นทางขับรถ</h4>
+            <h4 className="text-xs font-bold text-slate-800 leading-tight">{t('mapTitle')}</h4>
             <div className="text-[11px] text-blue-700 font-semibold flex items-center gap-1">
-              <span>{activePlaces.length} จุด</span>
+              <span>{t('stopsUnit', { count: activePlaces.length })}</span>
               <span>•</span>
-              <span>{routeSummary.totalDistanceKm} กม.</span>
+              <span>{routeSummary.totalDistanceKm} {t('kmUnit')}</span>
               <span>•</span>
-              <span>{formatDurationThai(routeSummary.totalDurationMinutes)}</span>
+              <span>{formatDuration(routeSummary.totalDurationMinutes)}</span>
             </div>
           </div>
         </div>
@@ -203,16 +219,16 @@ export const RouteMap: React.FC<RouteMapProps> = ({
             target="_blank"
             rel="noopener noreferrer"
             className="p-1.5 rounded-xl bg-white hover:bg-blue-50 text-blue-700 border border-blue-200 text-xs font-bold flex items-center gap-1 cursor-pointer transition-all active:scale-95"
-            title="เปิดใน Google Maps ทั้งเส้นทาง"
+            title="Open in Google Maps"
           >
             <Navigation className="w-3.5 h-3.5 text-blue-600" />
-            <span className="text-[11px] hidden sm:inline">Google Maps</span>
+            <span className="text-[11px] hidden sm:inline">{t('openGoogleMaps')}</span>
           </a>
 
           <button
             onClick={() => setIsExpanded(!isExpanded)}
             className="p-1.5 rounded-xl bg-white hover:bg-slate-100 text-slate-600 border border-slate-200 cursor-pointer transition-all active:scale-95"
-            title={isExpanded ? 'ย่อแผนที่' : 'ขยายแผนที่'}
+            title={isExpanded ? t('collapseMap') : t('expandMap')}
           >
             {isExpanded ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
           </button>
@@ -231,9 +247,14 @@ export const RouteMap: React.FC<RouteMapProps> = ({
         /* Graceful Fallback if map tiles cannot be loaded */
         <div className="p-4 bg-slate-50 text-center">
           <MapPin className="w-8 h-8 text-blue-500 mx-auto mb-1.5" />
-          <p className="text-xs font-bold text-slate-700">เส้นทางพร้อมนำทาง {activePlaces.length} จุด</p>
+          <p className="text-xs font-bold text-slate-700">
+            {t('fallbackReady', { count: activePlaces.length })}
+          </p>
           <p className="text-[11px] text-slate-500 mt-0.5">
-            รวมระยะทาง {routeSummary.totalDistanceKm} กม. (~{formatDurationThai(routeSummary.totalDurationMinutes)})
+            {t('fallbackSub', {
+              km: routeSummary.totalDistanceKm,
+              time: formatDuration(routeSummary.totalDurationMinutes),
+            })}
           </p>
           <a
             href={fullDirectionsUrl}
@@ -242,7 +263,7 @@ export const RouteMap: React.FC<RouteMapProps> = ({
             className="mt-2.5 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-600 text-white font-bold text-xs"
           >
             <ExternalLink className="w-3.5 h-3.5" />
-            <span>เปิด Google Maps นำทาง</span>
+            <span>{t('openGoogleMaps')}</span>
           </a>
         </div>
       )}
