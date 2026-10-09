@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import type { Place, MissionState, TripJournal, PhotoItem } from './types';
 import { INITIAL_PLACES, INITIAL_TRIP_INFO } from './data/places';
 import { INITIAL_PHOTO_MISSIONS } from './data/missions';
@@ -427,6 +428,9 @@ export function App() {
         onSyncToSupabase={handleSyncToSupabase}
         isSyncing={isSyncing}
       />
+
+      {/* Vercel Web Analytics */}
+      <Analytics />
     </div>
   );
 }
