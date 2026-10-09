@@ -40,7 +40,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
   const LANGUAGES: { code: Language; label: string; flag: string }[] = [
     { code: 'th', label: 'ไทย', flag: '🇹🇭' },
-    { code: 'en', label: 'English', flag: '🇬🇧' },
+    { code: 'en', label: 'English', flag: '🇺🇸' },
     { code: 'zh', label: '中文', flag: '🇨🇳' },
   ];
 
@@ -199,13 +199,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           <div className="space-y-2 pt-1 border-t border-slate-100">
             <span className="font-bold text-slate-700 block">🔗 {t('githubRepo')}:</span>
             <a
-              href="https://github.com/nattapat-poo/triptales"
+              href="https://github.com/mekntp/triptales"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 transition-colors"
             >
               <span className="font-semibold text-slate-800">🐙 GitHub Repo</span>
-              <span className="text-slate-400 text-[10px]">nattapat-poo/triptales</span>
+              <span className="text-slate-400 text-[10px]">mekntp/triptales</span>
             </a>
           </div>
 

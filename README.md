@@ -59,7 +59,7 @@
 ### 1. Clone Repository & ติดตั้ง Dependencies
 
 ```bash
-git clone https://github.com/nattapat-poo/triptales.git
+git clone https://github.com/mekntp/triptales.git
 cd triptales
 npm install
 ```

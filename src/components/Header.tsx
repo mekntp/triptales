@@ -60,7 +60,7 @@ export const Header: React.FC<HeaderProps> = ({
               title="Switch language / เปลี่ยนภาษา / 切换语言"
             >
               <Globe className="w-3.5 h-3.5 text-amber-600" />
-              <span>{language === 'th' ? '🇹🇭 TH' : language === 'en' ? '🇬🇧 EN' : '🇨🇳 中'}</span>
+              <span>{language === 'th' ? '🇹🇭 TH' : language === 'en' ? '🇺🇸 EN' : '🇨🇳 中'}</span>
             </button>
 
             {/* Victory / Achievements button */}
