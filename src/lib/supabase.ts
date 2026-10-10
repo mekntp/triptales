@@ -113,7 +113,7 @@ export async function signInWithOtp(email: string): Promise<{ error: Error | nul
   return { error };
 }
 
-export async function signInWithOAuth(provider: 'google' | 'apple' | 'facebook'): Promise<{ error: Error | null }> {
+export async function signInWithOAuth(provider: 'google' | 'facebook' | 'twitter' | 'apple'): Promise<{ error: Error | null }> {
   const client = getSupabaseClient();
   if (!client) return { error: new Error('Supabase client not configured') };
   const { error } = await client.auth.signInWithOAuth({

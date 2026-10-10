@@ -126,7 +126,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     }
   };
 
-  const handleOAuthSignIn = async (provider: 'google' | 'apple' | 'facebook') => {
+  const handleOAuthSignIn = async (provider: 'google' | 'facebook' | 'twitter' | 'apple') => {
     setAuthLoading(true);
     setAuthMsg(null);
     try {
@@ -448,22 +448,33 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">
                         {t('connectedAccounts')}
                       </span>
-                      <div className="grid grid-cols-2 gap-1.5">
+                      <div className="grid grid-cols-3 gap-1.5">
                         <button
                           onClick={() => handleOAuthSignIn('google')}
                           disabled={authLoading}
-                          className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 text-slate-700 dark:text-slate-200 font-bold text-[11px] flex items-center justify-center gap-1 cursor-pointer transition-colors"
+                          className="p-2 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 text-slate-700 dark:text-slate-200 font-bold text-[11px] flex items-center justify-center gap-1 cursor-pointer transition-colors active:scale-95"
+                          title="Sign in with Google"
                         >
                           <span>🌐</span>
                           <span>Google</span>
                         </button>
                         <button
-                          onClick={() => handleOAuthSignIn('apple')}
+                          onClick={() => handleOAuthSignIn('facebook')}
                           disabled={authLoading}
-                          className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 text-slate-700 dark:text-slate-200 font-bold text-[11px] flex items-center justify-center gap-1 cursor-pointer transition-colors"
+                          className="p-2 rounded-xl border border-blue-200 dark:border-blue-900 bg-blue-50/50 dark:bg-blue-950/40 hover:bg-blue-100 text-blue-700 dark:text-blue-300 font-bold text-[11px] flex items-center justify-center gap-1 cursor-pointer transition-colors active:scale-95"
+                          title="Sign in with Facebook"
                         >
-                          <span>🍎</span>
-                          <span>Apple</span>
+                          <span>📘</span>
+                          <span>Facebook</span>
+                        </button>
+                        <button
+                          onClick={() => handleOAuthSignIn('twitter')}
+                          disabled={authLoading}
+                          className="p-2 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-900 dark:text-white font-bold text-[11px] flex items-center justify-center gap-1 cursor-pointer transition-colors active:scale-95"
+                          title="Sign in with X"
+                        >
+                          <span className="font-mono font-black text-xs">𝕏</span>
+                          <span>X</span>
                         </button>
                       </div>
                     </div>
