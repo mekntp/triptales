@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Analytics } from '@vercel/analytics/react';
-import type { Place, MissionState, TripJournal, Trip, SyncStatus } from './types';
+import type { Place, MissionState, TripJournal, Trip, SyncStatus, CitySearchResult } from './types';
 import { INITIAL_PLACES, INITIAL_TRIPS } from './data/places';
 import { INITIAL_PHOTO_MISSIONS } from './data/missions';
 import { Header, type ActiveTab } from './components/Header';
@@ -8,6 +8,8 @@ import { ProgressBar } from './components/ProgressBar';
 import { PlacesTab } from './components/PlacesTab';
 import { PhotoHuntTab } from './components/PhotoHuntTab';
 import { JournalTab } from './components/JournalTab';
+import { TripsOverviewTab } from './components/TripsOverviewTab';
+import { CityDiscoveryTab } from './components/CityDiscoveryTab';
 import { VictoryModal } from './components/VictoryModal';
 import { PhotoModal } from './components/PhotoModal';
 import { SettingsModal } from './components/SettingsModal';
@@ -21,6 +23,7 @@ import {
   getAllJournalsFromDB,
   getAllTripsFromDB,
   saveTripToDB,
+  deleteTripFromDB,
   clearAllLocalData,
 } from './lib/db';
 import {
@@ -289,6 +292,133 @@ export function App() {
         updatedAt: new Date().toISOString(),
       }
     );
+
+    // Switch to places tab
+    setActiveTab('places');
+  };
+
+  // ==================== TRIP MANAGEMENT (CREATE, EDIT, DUPLICATE, ARCHIVE, DELETE) ====================
+  const handleCreateTrip = async (newTripData: Omit<Trip, 'id'>) => {
+    const newId = `trip_${Date.now()}`;
+    const newTrip: Trip = {
+      ...newTripData,
+      id: newId,
+    };
+
+    const updatedTrips = [newTrip, ...trips];
+    setTrips(updatedTrips);
+    await saveTripToDB(newTrip);
+    handleSelectTrip(newId);
+  };
+
+  const handleUpdateTrip = async (updatedTrip: Trip) => {
+    const updated = trips.map((t) => (t.id === updatedTrip.id ? updatedTrip : t));
+    setTrips(updated);
+    await saveTripToDB(updatedTrip);
+  };
+
+  const handleDuplicateTrip = async (tripId: string) => {
+    const sourceTrip = trips.find((t) => t.id === tripId);
+    if (!sourceTrip) return;
+
+    const newId = `trip_${Date.now()}`;
+    const duplicatedTrip: Trip = {
+      ...sourceTrip,
+      id: newId,
+      name: `${sourceTrip.name} (Copy)`,
+      nameEn: sourceTrip.nameEn ? `${sourceTrip.nameEn} (Copy)` : undefined,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    const updated = [duplicatedTrip, ...trips];
+    setTrips(updated);
+    await saveTripToDB(duplicatedTrip);
+
+    // Copy places to duplicated trip
+    const sourcePlaces = await getPlacesFromDB(tripId);
+    if (sourcePlaces && sourcePlaces.length > 0) {
+      const clonedPlaces = sourcePlaces.map((p, idx) => ({
+        ...p,
+        id: `p_${Date.now()}_${idx}`,
+        tripId: newId,
+      }));
+      await savePlacesToDB(clonedPlaces, newId);
+    }
+
+    handleSelectTrip(newId);
+  };
+
+  const handleArchiveTrip = async (tripId: string) => {
+    const target = trips.find((t) => t.id === tripId);
+    if (!target) return;
+
+    const newStatus = target.status === 'archived' ? 'upcoming' : 'archived';
+    const updatedTrip: Trip = {
+      ...target,
+      status: newStatus,
+      updatedAt: new Date().toISOString(),
+    };
+
+    await handleUpdateTrip(updatedTrip);
+  };
+
+  const handleDeleteTrip = async (tripId: string) => {
+    const updated = trips.filter((t) => t.id !== tripId);
+    setTrips(updated);
+    await deleteTripFromDB(tripId);
+
+    // Remove local storage caches
+    localStorage.removeItem(`triptales_places_${tripId}`);
+    localStorage.removeItem(`triptales_mission_states_${tripId}`);
+
+    if (activeTripId === tripId && updated.length > 0) {
+      handleSelectTrip(updated[0].id);
+    }
+  };
+
+  // Add place from City Discovery to a specific trip
+  const handleAddPlaceToTrip = async (
+    placeData: Omit<Place, 'id' | 'sortOrder'>,
+    targetTripId: string
+  ) => {
+    const targetPlaces =
+      targetTripId === activeTripId
+        ? places
+        : (await getPlacesFromDB(targetTripId)) || [];
+
+    const newPlace: Place = {
+      ...placeData,
+      id: `p_${Date.now()}`,
+      tripId: targetTripId,
+      sortOrder: targetPlaces.length + 1,
+      updatedAt: new Date().toISOString(),
+    };
+
+    const updatedPlaces = [...targetPlaces, newPlace];
+
+    if (targetTripId === activeTripId) {
+      handleUpdatePlaces(updatedPlaces);
+    } else {
+      await savePlacesToDB(updatedPlaces, targetTripId);
+      localStorage.setItem(`triptales_places_${targetTripId}`, JSON.stringify(updatedPlaces));
+    }
+  };
+
+  const handleCreateTripFromCity = (city: CitySearchResult) => {
+    handleCreateTrip({
+      name: `${city.name} Trip`,
+      nameEn: `${city.name} Trip`,
+      destinationCity: city.name,
+      subtitle: `Family adventure in ${city.displayName}`,
+      description: `Exploring cultural sights, nature, and family highlights in ${city.name}.`,
+      startDate: new Date().toISOString().split('T')[0],
+      status: 'upcoming',
+      coverImage:
+        'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
   };
 
   // ==================== STATE PERSISTENCE ====================
@@ -456,7 +586,7 @@ export function App() {
   const handleExportBackup = () => {
     const backupData = {
       app: 'TripTales',
-      version: '2.5.0',
+      version: '3.0.0',
       exportedAt: new Date().toISOString(),
       trip: activeTrip,
       trips,
@@ -534,7 +664,7 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-amber-50/40 pb-16">
+    <div className="min-h-screen bg-amber-50/40 dark:bg-slate-950 pb-16 transition-colors duration-200">
       {/* Top Header */}
       <Header
         activeTab={activeTab}
@@ -549,15 +679,31 @@ export function App() {
 
       {/* Main Container */}
       <main className="max-w-md mx-auto px-4 pt-3">
-        {/* Progress Score Bar */}
-        <ProgressBar
-          totalStars={totalStars}
-          completedCount={completedCount}
-          totalMissions={INITIAL_PHOTO_MISSIONS.length}
-          onOpenVictory={() => setIsVictoryOpen(true)}
-        />
+        {/* Progress Score Bar (shown on Places & Hunt tabs) */}
+        {(activeTab === 'places' || activeTab === 'hunt') && (
+          <ProgressBar
+            totalStars={totalStars}
+            completedCount={completedCount}
+            totalMissions={INITIAL_PHOTO_MISSIONS.length}
+            onOpenVictory={() => setIsVictoryOpen(true)}
+          />
+        )}
 
-        {/* Tab 1: Itinerary & Route Map */}
+        {/* Tab 1: Trips Overview & Multi-Trip Management */}
+        {activeTab === 'trips' && (
+          <TripsOverviewTab
+            trips={trips}
+            activeTripId={activeTripId}
+            onSelectTrip={handleSelectTrip}
+            onCreateTrip={handleCreateTrip}
+            onUpdateTrip={handleUpdateTrip}
+            onDuplicateTrip={handleDuplicateTrip}
+            onArchiveTrip={handleArchiveTrip}
+            onDeleteTrip={handleDeleteTrip}
+          />
+        )}
+
+        {/* Tab 2: Itinerary & Route Map */}
         {activeTab === 'places' && (
           <PlacesTab
             places={places}
@@ -566,7 +712,7 @@ export function App() {
           />
         )}
 
-        {/* Tab 2: Photo Scavenger Hunt */}
+        {/* Tab 3: Photo Scavenger Hunt */}
         {activeTab === 'hunt' && (
           <PhotoHuntTab
             missions={INITIAL_PHOTO_MISSIONS}
@@ -576,12 +722,22 @@ export function App() {
           />
         )}
 
-        {/* Tab 3: Daily Journal */}
+        {/* Tab 4: Daily Journal */}
         {activeTab === 'journal' && (
           <JournalTab
             currentJournal={currentJournal}
             allJournals={allJournals}
             onSaveJournal={handleSaveJournal}
+          />
+        )}
+
+        {/* Tab 5: City Discovery & Recommendations */}
+        {activeTab === 'discover' && (
+          <CityDiscoveryTab
+            trips={trips}
+            activeTrip={activeTrip}
+            onAddPlaceToTrip={handleAddPlaceToTrip}
+            onCreateTripFromCity={handleCreateTripFromCity}
           />
         )}
       </main>

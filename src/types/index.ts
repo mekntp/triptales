@@ -71,6 +71,9 @@ export interface TripJournal {
 }
 
 export type SyncStatus = 'local_only' | 'syncing' | 'synced' | 'error' | 'offline';
+export type TripStatus = 'upcoming' | 'ongoing' | 'completed' | 'archived';
+export type ThemeMode = 'system' | 'light' | 'dark';
+export type DistanceUnit = 'km' | 'mi';
 
 export interface Trip {
   id: string;
@@ -78,6 +81,9 @@ export interface Trip {
   name: string;
   nameEn?: string;
   nameZh?: string;
+  destinationCity?: string;
+  startDate?: string;
+  endDate?: string;
   subtitle: string;
   subtitleEn?: string;
   subtitleZh?: string;
@@ -85,9 +91,45 @@ export interface Trip {
   descriptionEn?: string;
   descriptionZh?: string;
   coverImage?: string;
+  status?: TripStatus;
   createdAt?: string;
   updatedAt?: string;
   isDeleted?: boolean;
+}
+
+export interface CitySearchResult {
+  id: string;
+  name: string;
+  displayName: string;
+  country: string;
+  countryCode: string;
+  latitude: number;
+  longitude: number;
+  type: string;
+}
+
+export type PlaceCategory =
+  | 'all'
+  | 'attraction'
+  | 'culture'
+  | 'nature'
+  | 'family'
+  | 'food'
+  | 'market';
+
+export interface RecommendedPlace {
+  id: string;
+  name: string;
+  category: PlaceCategory;
+  categoryLabel: string;
+  icon: string;
+  description: string;
+  latitude: number;
+  longitude: number;
+  distanceFromCenterKm?: number;
+  isFamilyFriendly?: boolean;
+  address?: string;
+  verifiedSource: string;
 }
 
 export interface RankInfo {

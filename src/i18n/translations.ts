@@ -167,6 +167,75 @@ export const TRANSLATIONS = {
     magicLinkSent: 'Check your email for the login link!',
     guestModeDesc: 'Guest mode: Data is saved safely on this device. Sign in to enable private multi-device cloud backup protected by Row Level Security.',
 
+    // Tabs
+    tabTrips: 'My Trips',
+    tabDiscover: 'Discover Cities',
+
+    // Trips Overview & Management
+    myTripsTitle: 'My Trips',
+    myTripsSubtitle: 'Create, organize, and revisit family journeys.',
+    newTripBtn: 'New Trip',
+    newTripModalTitle: 'Create New Trip',
+    editTripTitle: 'Edit Trip Details',
+    tripNameLabel: 'Trip Name',
+    destinationCityLabel: 'Destination City',
+    startDateLabel: 'Start Date',
+    endDateLabel: 'End Date',
+    searchTripsPlaceholder: 'Search saved trips...',
+    filterAllTrips: 'All',
+    filterActiveTrips: 'Active',
+    filterArchivedTrips: 'Archived',
+    noTripsFound: 'No trips match your search.',
+    noTripsHint: 'Plan your next family adventure or road trip.',
+    createFirstTrip: 'Create Your First Trip',
+    activeBadge: 'Active',
+    archivedBadge: 'Archived',
+    editTrip: 'Edit Trip',
+    duplicateTrip: 'Duplicate Trip',
+    archiveTrip: 'Archive Trip',
+    restoreTrip: 'Restore Trip',
+    deleteTrip: 'Delete Trip',
+    deleteTripConfirm: 'Are you sure you want to delete "{name}"? Places and photos for this trip will be removed.',
+    currentlyPlanning: 'Planning Now',
+    openTrip: 'Open Trip',
+
+    // City Discovery & Recommendations
+    cityDiscoveryTitle: 'Discover Destinations',
+    cityDiscoverySubtitle: 'Search cities worldwide and explore recommended places.',
+    searchCityPlaceholder: 'Search city (e.g. Bangkok, Phichit, Tokyo)...',
+    createTripFromCity: 'Plan Trip Here',
+    addToTripLabel: 'Add to Trip',
+    recommendedPlaces: 'Recommended Highlights',
+    loadingRecommendations: 'Finding verified places to explore...',
+    noRecommendationsFound: 'No highlights found for this category.',
+    addedToTrip: 'Added to Trip',
+    addToTrip: 'Add to Trip',
+    catAll: 'All',
+    catAttraction: 'Attractions',
+    catCulture: 'Culture',
+    catNature: 'Nature',
+    catFamily: 'Family Fun',
+    catMarket: 'Markets',
+
+    // Appearance & Themes
+    themeSection: 'Appearance & Theme',
+    themeLight: 'Light',
+    themeDark: 'Dark',
+    themeSystem: 'System',
+
+    // Connected Accounts & OAuth
+    connectedAccounts: 'Connected Accounts',
+    signInGoogle: 'Sign in with Google',
+    signInApple: 'Sign in with Apple',
+    signInFacebook: 'Sign in with Facebook',
+    deleteAccount: 'Delete Account & Cloud Data',
+    deleteAccountConfirm: 'Are you sure you want to delete your account and remove all synced cloud data? This cannot be undone.',
+
+    // Distance Units & Preferences
+    prefDistanceUnit: 'Distance Unit',
+    unitKm: 'Kilometers (km)',
+    unitMi: 'Miles (mi)',
+
     // Multi-Trip
     switchTrip: 'Switch Trip',
     currentTrip: 'Current Trip',
@@ -357,6 +426,75 @@ export const TRANSLATIONS = {
     magicLinkSent: 'ส่งลิงก์เข้าสู่ระบบไปที่อีเมลของคุณแล้วครับ!',
     guestModeDesc: 'โหมดผู้เยี่ยมชม: ข้อมูลจัดเก็บในเครื่องอย่างปลอดภัย เข้าสู่ระบบเพื่อเปิดใช้งานการสำรองข้อมูลส่วนตัวแบบหลายอุปกรณ์ (RLS)',
 
+    // Tabs
+    tabTrips: 'ทริปของฉัน',
+    tabDiscover: 'ค้นหาเมือง',
+
+    // Trips Overview & Management
+    myTripsTitle: 'ทริปการเดินทางของฉัน',
+    myTripsSubtitle: 'สร้าง จัดระเบียบ และกลับมาเปิดดูทริปครอบครัวได้ทุกเมื่อ',
+    newTripBtn: 'สร้างทริปใหม่',
+    newTripModalTitle: 'สร้างทริปท่องเที่ยวใหม่',
+    editTripTitle: 'แก้ไขรายละเอียดทริป',
+    tripNameLabel: 'ชื่อทริป',
+    destinationCityLabel: 'เมืองปลายทาง',
+    startDateLabel: 'วันเริ่มต้น',
+    endDateLabel: 'วันสิ้นสุด',
+    searchTripsPlaceholder: 'ค้นหาทริปที่บันทึกไว้...',
+    filterAllTrips: 'ทั้งหมด',
+    filterActiveTrips: 'กำลังเที่ยว',
+    filterArchivedTrips: 'เก็บถาวร',
+    noTripsFound: 'ไม่พบทริปที่ตรงกับการค้นหา',
+    noTripsHint: 'วางแผนทริปขับรถเที่ยว หรือวันหยุดพักผ่อนของครอบครัว',
+    createFirstTrip: 'สร้างทริปแรกของคุณเลย',
+    activeBadge: 'ทริปปัจจุบัน',
+    archivedBadge: 'เก็บถาวรแล้ว',
+    editTrip: 'แก้ไขทริป',
+    duplicateTrip: 'คัดลอกทริป',
+    archiveTrip: 'เก็บถาวร',
+    restoreTrip: 'กู้คืนทริป',
+    deleteTrip: 'ลบทริป',
+    deleteTripConfirm: 'คุณแน่ใจหรือไม่ว่าต้องการลบทริป "{name}"? สถานที่และรูปถ่ายทั้งหมดในทริปนี้จะถูกลบออก',
+    currentlyPlanning: 'กำลังใช้งาน',
+    openTrip: 'เปิดทริปนี้',
+
+    // City Discovery & Recommendations
+    cityDiscoveryTitle: 'ค้นพบจุดหมายปลายทาง',
+    cityDiscoverySubtitle: 'ค้นหาเมืองทั่วโลกและสำรวจสถานที่ท่องเที่ยวยอดนิยม',
+    searchCityPlaceholder: 'พิมพ์ชื่อเมือง (เช่น พิจิตร, กรุงเทพ, โตเกียว)...',
+    createTripFromCity: 'เริ่มวางแผนทริปเมืองนี้',
+    addToTripLabel: 'เพิ่มเข้าทริป',
+    recommendedPlaces: 'สถานที่แนะนำยอดนิยม',
+    loadingRecommendations: 'กำลังค้นหาสถานที่เที่ยวที่น่าสนใจ...',
+    noRecommendationsFound: 'ไม่พบสถานที่ในหมวดหมู่นี้',
+    addedToTrip: 'เพิ่มแล้ว',
+    addToTrip: 'เพิ่มเข้าทริป',
+    catAll: 'ทั้งหมด',
+    catAttraction: 'แลนด์มาร์ก',
+    catCulture: 'วัฒนธรรม/วัด',
+    catNature: 'ธรรมชาติ/สวน',
+    catFamily: 'เด็กและครอบครัว',
+    catMarket: 'ตลาด/ช้อปปิ้ง',
+
+    // Appearance & Themes
+    themeSection: 'ธีมและการแสดงผล',
+    themeLight: 'โหมดสว่าง (Light)',
+    themeDark: 'โหมดมืด (Dark)',
+    themeSystem: 'ตามระบบเครื่อง (System)',
+
+    // Connected Accounts & OAuth
+    connectedAccounts: 'บัญชีที่เชื่อมต่อ',
+    signInGoogle: 'เข้าสู่ระบบด้วย Google',
+    signInApple: 'เข้าสู่ระบบด้วย Apple',
+    signInFacebook: 'เข้าสู่ระบบด้วย Facebook',
+    deleteAccount: 'ลบบัญชีและข้อมูลบนคลาวด์',
+    deleteAccountConfirm: 'คุณแน่ใจหรือไม่ว่าต้องการลบบัญชีและล้างข้อมูลบน Supabase Cloud ทั้งหมด? การกระทำนี้ไม่สามารถย้อนกลับได้',
+
+    // Distance Units & Preferences
+    prefDistanceUnit: 'หน่วยวัดระยะทาง',
+    unitKm: 'กิโลเมตร (กม.)',
+    unitMi: 'ไมล์ (mi)',
+
     // Multi-Trip
     switchTrip: 'เลือกทริปเดินทาง',
     currentTrip: 'ทริปปัจจุบัน',
@@ -546,6 +684,75 @@ export const TRANSLATIONS = {
     enterEmail: '输入邮箱以开启专属私有云备份：',
     magicLinkSent: '登录链接已发送至您的邮箱！',
     guestModeDesc: '访客模式：数据安全保存在本机。登录后即可启用由行级安全（RLS）保护的私有跨设备云备份。',
+
+    // Tabs
+    tabTrips: '我的行程',
+    tabDiscover: '发现城市',
+
+    // Trips Overview & Management
+    myTripsTitle: '我的旅行计划',
+    myTripsSubtitle: '创建、管理并随时重温全家人的精彩旅行。',
+    newTripBtn: '新建行程',
+    newTripModalTitle: '创建新旅行计划',
+    editTripTitle: '编辑旅行详情',
+    tripNameLabel: '旅行名称',
+    destinationCityLabel: '目的地城市',
+    startDateLabel: '出发日期',
+    endDateLabel: '返程日期',
+    searchTripsPlaceholder: '搜索已保存的行程...',
+    filterAllTrips: '全部',
+    filterActiveTrips: '进行中',
+    filterArchivedTrips: '已归档',
+    noTripsFound: '没有找到匹配的行程。',
+    noTripsHint: '规划您的下一次家庭公路之旅或周末度假。',
+    createFirstTrip: '创建第一个行程',
+    activeBadge: '当前行程',
+    archivedBadge: '已归档',
+    editTrip: '编辑行程',
+    duplicateTrip: '复制行程',
+    archiveTrip: '归档行程',
+    restoreTrip: '恢复行程',
+    deleteTrip: '删除行程',
+    deleteTripConfirm: '确定要删除“{name}”吗？该行程的所有地点与照片将被移除。',
+    currentlyPlanning: '当前规划中',
+    openTrip: '进入此行程',
+
+    // City Discovery & Recommendations
+    cityDiscoveryTitle: '探索世界目的地',
+    cityDiscoverySubtitle: '搜索全球城市，发现值得一去的精彩景点。',
+    searchCityPlaceholder: '输入城市名 (如：曼谷、披集、东京)...',
+    createTripFromCity: '以此城市开启行程',
+    addToTripLabel: '加入行程',
+    recommendedPlaces: '精选推荐好去处',
+    loadingRecommendations: '正在搜索验证过的精彩去处...',
+    noRecommendationsFound: '该分类下暂无推荐地点。',
+    addedToTrip: '已加入',
+    addToTrip: '加入行程',
+    catAll: '全部',
+    catAttraction: '经典地标',
+    catCulture: '寺庙文化',
+    catNature: '公园自然',
+    catFamily: '亲子游乐',
+    catMarket: '市集购物',
+
+    // Appearance & Themes
+    themeSection: '外观与主题',
+    themeLight: '明亮模式 (Light)',
+    themeDark: '深色模式 (Dark)',
+    themeSystem: '跟随系统 (System)',
+
+    // Connected Accounts & OAuth
+    connectedAccounts: '关联账户与社交登录',
+    signInGoogle: '使用 Google 登录',
+    signInApple: '使用 Apple 登录',
+    signInFacebook: '使用 Facebook 登录',
+    deleteAccount: '注销账户并清除云端数据',
+    deleteAccountConfirm: '确定要注销此账户并永久删除所有已同步的云端数据吗？此操作不可逆。',
+
+    // Distance Units & Preferences
+    prefDistanceUnit: '距离单位',
+    unitKm: '公里 (km)',
+    unitMi: '英里 (mi)',
 
     // Multi-Trip
     switchTrip: '切换行程',

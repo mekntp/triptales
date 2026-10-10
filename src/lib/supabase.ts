@@ -113,6 +113,37 @@ export async function signInWithOtp(email: string): Promise<{ error: Error | nul
   return { error };
 }
 
+export async function signInWithOAuth(provider: 'google' | 'apple' | 'facebook'): Promise<{ error: Error | null }> {
+  const client = getSupabaseClient();
+  if (!client) return { error: new Error('Supabase client not configured') };
+  const { error } = await client.auth.signInWithOAuth({
+    provider,
+    options: {
+      redirectTo: window.location.origin,
+    },
+  });
+  return { error };
+}
+
+export async function deleteUserAccount(): Promise<{ error: Error | null }> {
+  const client = getSupabaseClient();
+  if (!client) return { error: new Error('Supabase client not configured') };
+  try {
+    const user = await getCurrentUser();
+    if (!user) return { error: new Error('No user logged in') };
+    
+    // Soft delete / tombstone all user trips
+    await client.from('trips').update({ is_deleted: true }).eq('user_id', user.id);
+    await client.from('places').update({ is_deleted: true }).eq('user_id', user.id);
+    await client.from('trip_journal').update({ is_deleted: true }).eq('user_id', user.id);
+    
+    await signOut();
+    return { error: null };
+  } catch (err) {
+    return { error: err as Error };
+  }
+}
+
 export async function signOut(): Promise<void> {
   const client = getSupabaseClient();
   if (!client) return;

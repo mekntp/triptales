@@ -17,6 +17,10 @@ import {
   Map,
   CloudDownload,
   AlertCircle,
+  Moon,
+  Sun,
+  Monitor,
+  Gauge,
 } from 'lucide-react';
 import type { User } from '@supabase/supabase-js';
 import {
@@ -26,9 +30,12 @@ import {
   getSupabaseClient,
   getCurrentUser,
   signInWithOtp,
+  signInWithOAuth,
+  deleteUserAccount,
   signOut,
 } from '../lib/supabase';
 import { useLanguage } from '../i18n/LanguageContext';
+import { useTheme } from '../theme/ThemeContext';
 import type { Language } from '../i18n/translations';
 import type { Trip, SyncStatus } from '../types';
 
@@ -64,12 +71,24 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   syncStatus = 'local_only',
 }) => {
   const { language, setLanguage, t } = useLanguage();
+  const { theme, setTheme } = useTheme();
+
   const [config, setConfig] = useState(getStoredSupabaseConfig());
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [emailInput, setEmailInput] = useState('');
   const [authLoading, setAuthLoading] = useState(false);
   const [authMsg, setAuthMsg] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
+
+  // Preference: distance unit
+  const [distanceUnit, setDistanceUnit] = useState<'km' | 'mi'>(() => {
+    return (localStorage.getItem('triptales_distance_unit') as 'km' | 'mi') || 'km';
+  });
+
+  const handleUnitChange = (unit: 'km' | 'mi') => {
+    setDistanceUnit(unit);
+    localStorage.setItem('triptales_distance_unit', unit);
+  };
 
   useEffect(() => {
     if (isOpen) {
@@ -107,6 +126,36 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     }
   };
 
+  const handleOAuthSignIn = async (provider: 'google' | 'apple' | 'facebook') => {
+    setAuthLoading(true);
+    setAuthMsg(null);
+    try {
+      const { error } = await signInWithOAuth(provider);
+      if (error) {
+        setAuthMsg({ text: `${provider}: ${error.message}`, type: 'error' });
+      }
+    } catch (err) {
+      setAuthMsg({ text: (err as Error).message, type: 'error' });
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (window.confirm(t('deleteAccountConfirm'))) {
+      setAuthLoading(true);
+      const { error } = await deleteUserAccount();
+      if (error) {
+        alert(error.message);
+      } else {
+        setCurrentUser(null);
+        alert('Account deleted and cloud data wiped.');
+        onClose();
+      }
+      setAuthLoading(false);
+    }
+  };
+
   const handleSignOut = async () => {
     setAuthLoading(true);
     await signOut();
@@ -123,28 +172,30 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
-      <div className="bg-white rounded-3xl max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fade-in">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 dark:border-slate-800">
         {/* Header */}
-        <div className="p-4 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white z-10">
+        <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between sticky top-0 bg-white dark:bg-slate-900 z-10">
           <div className="flex items-center gap-2">
-            <Cloud className="w-5 h-5 text-amber-600" />
-            <h3 className="font-bold text-slate-800 text-base">{t('settingsTitle')}</h3>
+            <Cloud className="w-5 h-5 text-amber-500" />
+            <h3 className="font-bold text-slate-800 dark:text-slate-100 text-base">
+              {t('settingsTitle')}
+            </h3>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 cursor-pointer"
+            className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         <div className="p-5 space-y-5 text-xs">
-          {/* Trip Selector (Multi-Trip support) */}
+          {/* Trip Selector (Quick Switch) */}
           {trips.length > 1 && (
-            <div className="bg-amber-50/70 border border-amber-200 rounded-2xl p-3.5 space-y-2">
-              <div className="flex items-center gap-1.5 font-bold text-amber-950">
-                <Map className="w-4 h-4 text-amber-600" />
+            <div className="bg-amber-50/70 dark:bg-slate-800 border border-amber-200 dark:border-slate-700 rounded-2xl p-3.5 space-y-2">
+              <div className="flex items-center gap-1.5 font-bold text-amber-950 dark:text-amber-300">
+                <Map className="w-4 h-4 text-amber-500" />
                 <span>{t('switchTrip')}:</span>
               </div>
               <div className="grid grid-cols-1 gap-2">
@@ -164,12 +215,16 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       className={`p-2.5 rounded-xl text-left border transition-all cursor-pointer flex items-center justify-between ${
                         isSelected
                           ? 'bg-amber-500 text-white border-amber-600 font-bold shadow-xs'
-                          : 'bg-white text-slate-700 border-slate-200 hover:bg-amber-50 font-medium'
+                          : 'bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-600 hover:bg-amber-50 font-medium'
                       }`}
                     >
                       <div className="truncate pr-2">
                         <div className="truncate text-xs">{tripTitle}</div>
-                        <div className={`text-[10px] truncate ${isSelected ? 'text-amber-100' : 'text-slate-400'}`}>
+                        <div
+                          className={`text-[10px] truncate ${
+                            isSelected ? 'text-amber-100' : 'text-slate-400'
+                          }`}
+                        >
                           {trip.subtitle}
                         </div>
                       </div>
@@ -185,10 +240,53 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             </div>
           )}
 
+          {/* Theme Selector (Light, Dark, System) */}
+          <div className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-3.5 space-y-2">
+            <div className="flex items-center gap-1.5 font-bold text-slate-800 dark:text-slate-200">
+              <Sun className="w-4 h-4 text-amber-500" />
+              <span>{t('themeSection')}:</span>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              <button
+                onClick={() => setTheme('light')}
+                className={`py-2 px-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer border ${
+                  theme === 'light'
+                    ? 'bg-amber-500 text-white border-amber-600 shadow-xs'
+                    : 'bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-600'
+                }`}
+              >
+                <Sun className="w-3.5 h-3.5" />
+                <span>{t('themeLight')}</span>
+              </button>
+              <button
+                onClick={() => setTheme('dark')}
+                className={`py-2 px-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer border ${
+                  theme === 'dark'
+                    ? 'bg-amber-500 text-white border-amber-600 shadow-xs'
+                    : 'bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-600'
+                }`}
+              >
+                <Moon className="w-3.5 h-3.5" />
+                <span>{t('themeDark')}</span>
+              </button>
+              <button
+                onClick={() => setTheme('system')}
+                className={`py-2 px-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer border ${
+                  theme === 'system'
+                    ? 'bg-amber-500 text-white border-amber-600 shadow-xs'
+                    : 'bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-600'
+                }`}
+              >
+                <Monitor className="w-3.5 h-3.5" />
+                <span>{t('themeSystem')}</span>
+              </button>
+            </div>
+          </div>
+
           {/* Language Selector */}
-          <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 space-y-2">
-            <div className="flex items-center gap-1.5 font-bold text-slate-800">
-              <Globe className="w-4 h-4 text-amber-600" />
+          <div className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-3.5 space-y-2">
+            <div className="flex items-center gap-1.5 font-bold text-slate-800 dark:text-slate-200">
+              <Globe className="w-4 h-4 text-amber-500" />
               <span>Language / ภาษา / 语言:</span>
             </div>
             <div className="grid grid-cols-3 gap-2">
@@ -199,7 +297,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   className={`py-2 px-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer border ${
                     language === lang.code
                       ? 'bg-amber-500 text-white border-amber-600 shadow-xs scale-102'
-                      : 'bg-white text-slate-700 border-slate-200 hover:bg-amber-50'
+                      : 'bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-600 hover:bg-amber-50'
                   }`}
                 >
                   <span>{lang.flag}</span>
@@ -209,28 +307,54 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             </div>
           </div>
 
+          {/* Preferences: Distance Unit */}
+          <div className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-3.5 flex items-center justify-between">
+            <div className="flex items-center gap-1.5 font-bold text-slate-800 dark:text-slate-200">
+              <Gauge className="w-4 h-4 text-amber-500" />
+              <span>{t('prefDistanceUnit')}:</span>
+            </div>
+            <div className="flex items-center gap-1 bg-white dark:bg-slate-700 p-0.5 rounded-xl border border-slate-200 dark:border-slate-600">
+              <button
+                onClick={() => handleUnitChange('km')}
+                className={`px-3 py-1 rounded-lg font-bold text-xs cursor-pointer ${
+                  distanceUnit === 'km' ? 'bg-amber-500 text-white' : 'text-slate-600 dark:text-slate-300'
+                }`}
+              >
+                km
+              </button>
+              <button
+                onClick={() => handleUnitChange('mi')}
+                className={`px-3 py-1 rounded-lg font-bold text-xs cursor-pointer ${
+                  distanceUnit === 'mi' ? 'bg-amber-500 text-white' : 'text-slate-600 dark:text-slate-300'
+                }`}
+              >
+                mi
+              </button>
+            </div>
+          </div>
+
           {/* Offline-Ready Storage Notice */}
-          <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-3 flex items-start gap-2.5 text-emerald-900">
+          <div className="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 rounded-2xl p-3 flex items-start gap-2.5 text-emerald-900 dark:text-emerald-200">
             <Shield className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
             <div>
               <p className="font-bold">{t('offlineFirstTitle')}</p>
-              <p className="text-emerald-800 text-[11px] mt-0.5 leading-relaxed">
+              <p className="text-emerald-800 dark:text-emerald-300 text-[11px] mt-0.5 leading-relaxed">
                 {t('offlineFirstDesc')}
               </p>
             </div>
           </div>
 
           {/* Supabase Cloud & Row Level Security (RLS) Section */}
-          <div className="space-y-3 bg-slate-50 p-3.5 rounded-2xl border border-slate-200">
+          <div className="space-y-3 bg-slate-50 dark:bg-slate-800 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700">
             <div className="flex items-center justify-between">
-              <span className="font-bold text-slate-800 flex items-center gap-1.5">
+              <span className="font-bold text-slate-800 dark:text-slate-100 flex items-center gap-1.5">
                 <Lock className="w-3.5 h-3.5 text-blue-600" />
                 <span>{t('authSection')}</span>
               </span>
               <span
                 className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
                   currentUser
-                    ? 'bg-emerald-100 text-emerald-700'
+                    ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300'
                     : syncStatus === 'synced'
                     ? 'bg-emerald-100 text-emerald-700'
                     : syncStatus === 'syncing'
@@ -258,63 +382,107 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
             {/* Auth User Info or Magic Link Login */}
             {currentUser ? (
-              <div className="bg-white p-3 rounded-xl border border-emerald-200 space-y-2">
-                <div className="flex items-center gap-2 text-slate-700">
+              <div className="bg-white dark:bg-slate-700/80 p-3 rounded-xl border border-emerald-200 dark:border-emerald-800 space-y-2">
+                <div className="flex items-center gap-2 text-slate-700 dark:text-slate-200">
                   <UserIcon className="w-4 h-4 text-emerald-600" />
-                  <span className="font-semibold truncate">{currentUser.email || currentUser.id}</span>
+                  <span className="font-semibold truncate">
+                    {currentUser.email || currentUser.id}
+                  </span>
                 </div>
                 <div className="flex items-center justify-between pt-1">
-                  <span className="text-[10px] text-emerald-700 font-medium">
+                  <span className="text-[10px] text-emerald-700 dark:text-emerald-300 font-medium">
                     🛡️ Private Cloud Sync Active
                   </span>
-                  <button
-                    onClick={handleSignOut}
-                    disabled={authLoading}
-                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 text-[11px] font-bold cursor-pointer"
-                  >
-                    <LogOut className="w-3 h-3" />
-                    <span>{t('signOut')}</span>
-                  </button>
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={handleSignOut}
+                      disabled={authLoading}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-600 hover:bg-slate-200 text-slate-600 dark:text-slate-200 text-[11px] font-bold cursor-pointer"
+                    >
+                      <LogOut className="w-3 h-3" />
+                      <span>{t('signOut')}</span>
+                    </button>
+                    <button
+                      onClick={handleDeleteAccount}
+                      disabled={authLoading}
+                      className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 text-[11px] font-bold cursor-pointer"
+                      title="Delete Account"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </button>
+                  </div>
                 </div>
               </div>
             ) : (
-              <div className="space-y-2 bg-white p-3 rounded-xl border border-slate-200">
-                <p className="text-[11px] text-slate-600 leading-relaxed">
+              <div className="space-y-2.5 bg-white dark:bg-slate-700/70 p-3 rounded-xl border border-slate-200 dark:border-slate-600">
+                <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
                   {t('guestModeDesc')}
                 </p>
                 {isConnected && (
-                  <form onSubmit={handleSendMagicLink} className="space-y-2 pt-1">
-                    <div className="flex gap-1.5">
-                      <div className="relative flex-1">
-                        <Mail className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" />
-                        <input
-                          type="email"
-                          value={emailInput}
-                          onChange={(e) => setEmailInput(e.target.value)}
-                          placeholder="parent@example.com"
-                          className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-8 pr-3 py-1.5 text-slate-800 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none"
-                          required
-                        />
+                  <>
+                    <form onSubmit={handleSendMagicLink} className="space-y-2 pt-1">
+                      <div className="flex gap-1.5">
+                        <div className="relative flex-1">
+                          <Mail className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" />
+                          <input
+                            type="email"
+                            value={emailInput}
+                            onChange={(e) => setEmailInput(e.target.value)}
+                            placeholder="parent@example.com"
+                            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl pl-8 pr-3 py-1.5 text-slate-800 dark:text-slate-100 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                            required
+                          />
+                        </div>
+                        <button
+                          type="submit"
+                          disabled={authLoading}
+                          className="py-1.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs cursor-pointer transition-all disabled:opacity-50"
+                        >
+                          {authLoading ? '...' : t('sendMagicLink')}
+                        </button>
                       </div>
-                      <button
-                        type="submit"
-                        disabled={authLoading}
-                        className="py-1.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs cursor-pointer transition-all disabled:opacity-50"
-                      >
-                        {authLoading ? '...' : t('sendMagicLink')}
-                      </button>
+                    </form>
+
+                    {/* Social OAuth Buttons */}
+                    <div className="space-y-1.5 pt-1">
+                      <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">
+                        {t('connectedAccounts')}
+                      </span>
+                      <div className="grid grid-cols-2 gap-1.5">
+                        <button
+                          onClick={() => handleOAuthSignIn('google')}
+                          disabled={authLoading}
+                          className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 text-slate-700 dark:text-slate-200 font-bold text-[11px] flex items-center justify-center gap-1 cursor-pointer transition-colors"
+                        >
+                          <span>🌐</span>
+                          <span>Google</span>
+                        </button>
+                        <button
+                          onClick={() => handleOAuthSignIn('apple')}
+                          disabled={authLoading}
+                          className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 text-slate-700 dark:text-slate-200 font-bold text-[11px] flex items-center justify-center gap-1 cursor-pointer transition-colors"
+                        >
+                          <span>🍎</span>
+                          <span>Apple</span>
+                        </button>
+                      </div>
                     </div>
-                    {authMsg && (
-                      <div
-                        className={`text-[10px] font-semibold flex items-center gap-1 ${
-                          authMsg.type === 'success' ? 'text-emerald-600' : 'text-rose-600'
-                        }`}
-                      >
-                        {authMsg.type === 'success' ? <CheckCircle2 className="w-3 h-3" /> : <AlertCircle className="w-3 h-3" />}
-                        <span>{authMsg.text}</span>
-                      </div>
+                  </>
+                )}
+
+                {authMsg && (
+                  <div
+                    className={`text-[10px] font-semibold flex items-center gap-1 ${
+                      authMsg.type === 'success' ? 'text-emerald-600' : 'text-rose-600'
+                    }`}
+                  >
+                    {authMsg.type === 'success' ? (
+                      <CheckCircle2 className="w-3 h-3" />
+                    ) : (
+                      <AlertCircle className="w-3 h-3" />
                     )}
-                  </form>
+                    <span>{authMsg.text}</span>
+                  </div>
                 )}
               </div>
             )}
@@ -352,14 +520,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               </button>
             </div>
 
-            {/* Config inputs (collapsible or available) */}
+            {/* Config inputs (collapsible) */}
             <details className="pt-1">
-              <summary className="text-[11px] text-slate-500 font-semibold cursor-pointer hover:text-slate-700">
+              <summary className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold cursor-pointer hover:text-slate-700 dark:hover:text-slate-200">
                 ⚙️ Supabase API Keys & URL
               </summary>
-              <div className="space-y-2 mt-2 pt-2 border-t border-slate-200">
+              <div className="space-y-2 mt-2 pt-2 border-t border-slate-200 dark:border-slate-700">
                 <div>
-                  <label className="block text-slate-600 font-semibold mb-1 text-[11px]">
+                  <label className="block text-slate-600 dark:text-slate-300 font-semibold mb-1 text-[11px]">
                     Supabase Project URL:
                   </label>
                   <input
@@ -367,12 +535,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     value={config.url}
                     onChange={(e) => setConfig({ ...config, url: e.target.value })}
                     placeholder="https://your-project.supabase.co"
-                    className="w-full bg-white border border-slate-300 rounded-xl px-3 py-1.5 text-slate-800 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                    className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-1.5 text-slate-800 dark:text-slate-100 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-slate-600 font-semibold mb-1 text-[11px]">
+                  <label className="block text-slate-600 dark:text-slate-300 font-semibold mb-1 text-[11px]">
                     Supabase Anon Key:
                   </label>
                   <input
@@ -380,13 +548,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     value={config.anonKey}
                     onChange={(e) => setConfig({ ...config, anonKey: e.target.value })}
                     placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI..."
-                    className="w-full bg-white border border-slate-300 rounded-xl px-3 py-1.5 text-slate-800 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none font-mono"
+                    className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-1.5 text-slate-800 dark:text-slate-100 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none font-mono"
                   />
                 </div>
 
                 <button
                   onClick={handleSaveConfig}
-                  className="w-full py-1.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-900 text-white font-bold flex items-center justify-center gap-1.5 cursor-pointer"
+                  className="w-full py-1.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 text-white font-bold flex items-center justify-center gap-1.5 cursor-pointer"
                 >
                   <Save className="w-3.5 h-3.5" />
                   <span>{t('saveSettings')}</span>
@@ -403,17 +571,19 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
           {/* Backup / Export Section */}
           <div className="space-y-2 pt-1">
-            <span className="font-bold text-slate-700 block">{t('backupTitle')}</span>
+            <span className="font-bold text-slate-700 dark:text-slate-300 block">
+              {t('backupTitle')}
+            </span>
             <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={onExportBackup}
-                className="py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold flex items-center justify-center gap-1.5 cursor-pointer transition-all"
+                className="py-2 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-200 font-semibold flex items-center justify-center gap-1.5 cursor-pointer transition-all"
               >
                 <Download className="w-3.5 h-3.5" />
                 <span>{t('exportBackup')}</span>
               </button>
 
-              <label className="py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold flex items-center justify-center gap-1.5 cursor-pointer transition-all text-center">
+              <label className="py-2 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-200 font-semibold flex items-center justify-center gap-1.5 cursor-pointer transition-all text-center">
                 <Upload className="w-3.5 h-3.5" />
                 <span>{t('importBackup')}</span>
                 <input
@@ -427,28 +597,32 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           </div>
 
           {/* GitHub Repo Link */}
-          <div className="space-y-2 pt-1 border-t border-slate-100">
-            <span className="font-bold text-slate-700 block">🔗 {t('githubRepo')}:</span>
+          <div className="space-y-2 pt-1 border-t border-slate-100 dark:border-slate-800">
+            <span className="font-bold text-slate-700 dark:text-slate-300 block">
+              🔗 {t('githubRepo')}:
+            </span>
             <a
               href="https://github.com/mekntp/triptales"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 transition-colors"
+              className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 transition-colors"
             >
-              <span className="font-semibold text-slate-800">🐙 GitHub Repo</span>
+              <span className="font-semibold text-slate-800 dark:text-slate-100">
+                🐙 GitHub Repo
+              </span>
               <span className="text-slate-400 text-[10px]">mekntp/triptales</span>
             </a>
           </div>
 
           {/* Reset All Progress Section */}
-          <div className="pt-2 border-t border-slate-100">
+          <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
             <button
               onClick={() => {
                 if (window.confirm(t('resetConfirm'))) {
                   onResetAllData();
                 }
               }}
-              className="w-full py-2.5 px-3 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold flex items-center justify-center gap-1.5 cursor-pointer transition-all"
+              className="w-full py-2.5 px-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 font-bold flex items-center justify-center gap-1.5 cursor-pointer transition-all"
             >
               <Trash2 className="w-3.5 h-3.5" />
               <span>{t('resetTitle')}</span>
