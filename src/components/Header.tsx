@@ -1,7 +1,8 @@
 import React from 'react';
-import { MapPin, Camera, BookOpen, Trophy, Settings, Globe } from 'lucide-react';
+import { MapPin, Camera, BookOpen, Trophy, Settings, Globe, Cloud, Check, RefreshCw, AlertCircle } from 'lucide-react';
 import { useLanguage } from '../i18n/LanguageContext';
 import type { Language } from '../i18n/translations';
+import type { SyncStatus, Trip } from '../types';
 
 export type ActiveTab = 'places' | 'hunt' | 'journal';
 
@@ -12,6 +13,8 @@ interface HeaderProps {
   completedCount: number;
   onOpenVictory: () => void;
   onOpenSettings: () => void;
+  syncStatus?: SyncStatus;
+  activeTrip?: Trip;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -21,6 +24,8 @@ export const Header: React.FC<HeaderProps> = ({
   completedCount,
   onOpenVictory,
   onOpenSettings,
+  syncStatus = 'local_only',
+  activeTrip,
 }) => {
   const { language, setLanguage, t } = useLanguage();
 
@@ -29,6 +34,15 @@ export const Header: React.FC<HeaderProps> = ({
     const nextIdx = (cycle.indexOf(language) + 1) % cycle.length;
     setLanguage(cycle[nextIdx]);
   };
+
+  const tripDisplayName =
+    activeTrip
+      ? language === 'en' && activeTrip.nameEn
+        ? activeTrip.nameEn
+        : language === 'zh' && activeTrip.nameZh
+        ? activeTrip.nameZh
+        : activeTrip.name
+      : t('tripBadge');
 
   return (
     <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-amber-200/60 shadow-xs">
@@ -42,17 +56,58 @@ export const Header: React.FC<HeaderProps> = ({
                 <h1 className="text-lg font-black text-slate-800 leading-tight">
                   {t('appTitle')}
                 </h1>
-                <span className="text-[10px] bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full border border-amber-300">
-                  {t('tripBadge')}
-                </span>
+                <button
+                  onClick={onOpenSettings}
+                  className="text-[10px] bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold px-2 py-0.5 rounded-full border border-amber-300 cursor-pointer transition-colors truncate max-w-32"
+                  title="Switch trip in settings"
+                >
+                  {tripDisplayName}
+                </button>
               </div>
-              <p className="text-[11px] text-slate-500 font-medium">
+              <p className="text-[11px] text-slate-500 font-medium truncate max-w-56">
                 {t('tagline')}
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-1.5">
+            {/* Sync status indicator */}
+            <button
+              onClick={onOpenSettings}
+              className="p-1.5 rounded-xl border transition-all cursor-pointer flex items-center justify-center"
+              title={
+                syncStatus === 'synced'
+                  ? 'Cloud Synced'
+                  : syncStatus === 'syncing'
+                  ? 'Syncing to cloud...'
+                  : syncStatus === 'error'
+                  ? 'Sync failed'
+                  : 'Saved on device'
+              }
+            >
+              {syncStatus === 'synced' && (
+                <div className="flex items-center text-emerald-600 bg-emerald-50 p-1 rounded-lg border border-emerald-200">
+                  <Cloud className="w-3.5 h-3.5" />
+                  <Check className="w-2.5 h-2.5 -ml-1" />
+                </div>
+              )}
+              {syncStatus === 'syncing' && (
+                <div className="flex items-center text-blue-600 bg-blue-50 p-1 rounded-lg border border-blue-200">
+                  <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                </div>
+              )}
+              {syncStatus === 'error' && (
+                <div className="flex items-center text-rose-600 bg-rose-50 p-1 rounded-lg border border-rose-200">
+                  <AlertCircle className="w-3.5 h-3.5" />
+                </div>
+              )}
+              {syncStatus === 'local_only' && (
+                <div className="flex items-center text-slate-400 bg-slate-50 p-1 rounded-lg border border-slate-200">
+                  <Cloud className="w-3.5 h-3.5" />
+                </div>
+              )}
+            </button>
+
             {/* Language Switcher Pill */}
             <button
               onClick={handleNextLanguage}

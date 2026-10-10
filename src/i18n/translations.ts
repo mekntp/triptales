@@ -142,10 +142,39 @@ export const TRANSLATIONS = {
     shareResult: 'Share Result',
     close: 'Close',
 
+    // Exit Confirmation
+    exitTitle: 'Exit TripTales?',
+    exitDesc: 'Your saved itinerary, photos, and journal entries are safely stored on this device.',
+    exitUnsavedWarning: '⚠️ You have unsaved changes or active edits in progress that may be lost if you leave now.',
+    exitStay: 'Stay in TripTales',
+    exitConfirm: 'Exit App',
+
+    // Route Disclaimers & Google Maps
+    routeEstDisclaimer: 'Distance and drive time are geometric approximations (Haversine × 1.28 road winding multiplier at ~35–60 km/h average speed). Real-world travel depends on actual road networks and live traffic. Please use Google Maps for turn-by-turn navigation.',
+    mapDisclaimer: 'Distances are estimates. Open in Google Maps for live turn-by-turn navigation.',
+
+    // Cloud Backup, Restore & Auth
+    restoreFromCloud: 'Restore from Cloud',
+    restoreConfirm: 'Do you want to restore the latest saved data from Supabase Cloud to this device?',
+    restoreSuccess: 'Restored from cloud successfully! ({places} places, {missions} missions, {journals} journals)',
+    restoreFailed: 'Failed to restore data: {error}',
+    syncSuccessSummary: 'Backed up to cloud successfully! ({places} places, {missions} missions, {photos} photos)',
+    authSection: 'User Account & Cloud Security (RLS)',
+    signedInAs: 'Signed in as: {email}',
+    signOut: 'Sign Out',
+    sendMagicLink: 'Send Magic Link / Sign In',
+    enterEmail: 'Enter your email for private cloud backup:',
+    magicLinkSent: 'Check your email for the login link!',
+    guestModeDesc: 'Guest mode: Data is saved safely on this device. Sign in to enable private multi-device cloud backup protected by Row Level Security.',
+
+    // Multi-Trip
+    switchTrip: 'Switch Trip',
+    currentTrip: 'Current Trip',
+
     // Settings
     settingsTitle: 'Settings & Cloud Sync',
-    offlineFirstTitle: '100% Offline-First Enabled:',
-    offlineFirstDesc: 'Photos, routes, and journal notes are saved locally (IndexedDB). No internet required during the trip.',
+    offlineFirstTitle: 'Offline-Ready Storage:',
+    offlineFirstDesc: 'Places, photos, and journal notes are saved locally in IndexedDB. Network is used when available for maps and cloud backup.',
     supabaseSection: '⚡ Connect Supabase Cloud',
     connected: '✓ Connected',
     localOnly: 'Local Mode',
@@ -303,10 +332,39 @@ export const TRANSLATIONS = {
     shareResult: 'แชร์ความสำเร็จ',
     close: 'ปิดหน้าต่าง',
 
+    // Exit Confirmation
+    exitTitle: 'ต้องการออกจาก TripTales?',
+    exitDesc: 'ข้อมูลสถานที่ ภาพถ่าย และบันทึกที่บันทึกไว้จะยังคงอยู่ในเครื่องอย่างปลอดภัยครับ',
+    exitUnsavedWarning: '⚠️ มีข้อมูลที่กำลังแก้ไขหรือกำลังซิงค์อยู่ซึ่งอาจยังไม่เสร็จสมบูรณ์',
+    exitStay: 'อยู่ต่อในแอป',
+    exitConfirm: 'ออกจากแอป',
+
+    // Route Disclaimers & Google Maps
+    routeEstDisclaimer: 'ระยะทางและเวลาขับรถเป็นการคำนวณทางเรขาคณิตโดยประมาณ (สูตร Haversine × 1.28 สัมประสิทธิ์ความคดเคี้ยวของถนน ที่ความเร็วเฉลี่ย 35–60 กม./ชม.) เส้นทางจริงขึ้นอยู่กับแนวถนนจริงและสภาพการจราจรสด โปรดใช้ Google Maps สำหรับการนำทางจริง',
+    mapDisclaimer: 'ระยะทางเป็นการประมาณการ แนะนำเปิดใน Google Maps สำหรับการนำทางจริง',
+
+    // Cloud Backup, Restore & Auth
+    restoreFromCloud: 'กู้คืนข้อมูลจากคลาวด์',
+    restoreConfirm: 'คุณต้องการดึงข้อมูลล่าสุดจาก Supabase Cloud มาบันทึกลงเครื่องใช่หรือไม่?',
+    restoreSuccess: 'กู้คืนข้อมูลจากคลาวด์สำเร็จเรียบร้อย! ({places} สถานที่, {missions} ภารกิจ, {journals} บันทึก)',
+    restoreFailed: 'ไม่สามารถกู้คืนข้อมูลได้: {error}',
+    syncSuccessSummary: 'สำรองข้อมูลขึ้นคลาวด์สำเร็จ! ({places} สถานที่, {missions} ภารกิจ, {photos} รูปถ่าย)',
+    authSection: 'บัญชีผู้ใช้ & ความปลอดภัย (RLS)',
+    signedInAs: 'เข้าสู่ระบบด้วย: {email}',
+    signOut: 'ออกจากระบบ',
+    sendMagicLink: 'ส่งลิงก์เข้าสู่ระบบ (Magic Link)',
+    enterEmail: 'กรอกอีเมลเพื่อเปิดใช้งานการสำรองข้อมูลส่วนตัว:',
+    magicLinkSent: 'ส่งลิงก์เข้าสู่ระบบไปที่อีเมลของคุณแล้วครับ!',
+    guestModeDesc: 'โหมดผู้เยี่ยมชม: ข้อมูลจัดเก็บในเครื่องอย่างปลอดภัย เข้าสู่ระบบเพื่อเปิดใช้งานการสำรองข้อมูลส่วนตัวแบบหลายอุปกรณ์ (RLS)',
+
+    // Multi-Trip
+    switchTrip: 'เลือกทริปเดินทาง',
+    currentTrip: 'ทริปปัจจุบัน',
+
     // Settings
     settingsTitle: 'การตั้งค่า & ระบบคลาวด์',
-    offlineFirstTitle: 'ระบบ Offline-First พร้อมทำงาน 100%:',
-    offlineFirstDesc: 'รูปถ่าย แผนการเดินทาง และบันทึกทริปจะถูกบันทึกลงในเครื่อง (IndexedDB) อัตโนมัติ ไม่มีเน็ตก็เปิดดูและใช้งานได้',
+    offlineFirstTitle: 'ระบบจัดเก็บข้อมูลพร้อมใช้ออฟไลน์:',
+    offlineFirstDesc: 'สถานที่ รูปถ่าย และบันทึกทริปจะถูกบันทึกลงในเครื่อง (IndexedDB) อัตโนมัติ โดยใช้เครือข่ายเมื่อพร้อมสำหรับแผนที่และการสำรองข้อมูล',
     supabaseSection: '⚡ เชื่อมต่อ Supabase Cloud',
     connected: '✓ พร้อมซิงค์',
     localOnly: 'โหมดในเครื่อง',
@@ -464,10 +522,39 @@ export const TRANSLATIONS = {
     shareResult: '分享成就',
     close: '关闭窗口',
 
+    // Exit Confirmation
+    exitTitle: '退出 TripTales？',
+    exitDesc: '保存在此设备上的景点、照片和日记均已安全存储。',
+    exitUnsavedWarning: '⚠️ 您有未保存的编辑内容或正在进行的操作，离开可能导致丢失。',
+    exitStay: '留在应用中',
+    exitConfirm: '确认退出',
+
+    // Route Disclaimers & Google Maps
+    routeEstDisclaimer: '距离与车程为几何预估（直线距离 × 1.28 道路蜿蜒系数，估算时速 35–60 公里）。实际用时受路网走向与实时路况影响。请使用 Google Maps 实时导航。',
+    mapDisclaimer: '距离与时间为预估值，请使用 Google Maps 获取实时导航。',
+
+    // Cloud Backup, Restore & Auth
+    restoreFromCloud: '从云端恢复数据',
+    restoreConfirm: '您确定要从 Supabase 云端拉取最新数据覆盖此设备吗？',
+    restoreSuccess: '云端数据恢复成功！（{places} 个地点，{missions} 项任务，{journals} 篇日记）',
+    restoreFailed: '恢复数据失败：{error}',
+    syncSuccessSummary: '成功备份至云端！（{places} 个地点，{missions} 项任务，{photos} 张照片）',
+    authSection: '用户账户与云安全 (RLS)',
+    signedInAs: '登录身份：{email}',
+    signOut: '退出登录',
+    sendMagicLink: '发送快捷登录邮件 (Magic Link)',
+    enterEmail: '输入邮箱以开启专属私有云备份：',
+    magicLinkSent: '登录链接已发送至您的邮箱！',
+    guestModeDesc: '访客模式：数据安全保存在本机。登录后即可启用由行级安全（RLS）保护的私有跨设备云备份。',
+
+    // Multi-Trip
+    switchTrip: '切换行程',
+    currentTrip: '当前行程',
+
     // Settings
     settingsTitle: '设置与云端同步',
-    offlineFirstTitle: '100% 离线可用：',
-    offlineFirstDesc: '照片、行程与日记自动保存在手机本地 (IndexedDB)。无网络信号也能顺畅使用。',
+    offlineFirstTitle: '支持离线存储：',
+    offlineFirstDesc: '行程、照片与日记保存在本地 IndexedDB。网络可用时用于地图加载与云端加密备份。',
     supabaseSection: '⚡ 连接 Supabase 云端',
     connected: '✓ 已连接同步',
     localOnly: '本地模式',

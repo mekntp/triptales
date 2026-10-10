@@ -206,9 +206,9 @@ export const RouteMap: React.FC<RouteMapProps> = ({
             <div className="text-[11px] text-blue-700 font-semibold flex items-center gap-1">
               <span>{t('stopsUnit', { count: activePlaces.length })}</span>
               <span>•</span>
-              <span>{routeSummary.totalDistanceKm} {t('kmUnit')}</span>
+              <span>~{routeSummary.totalDistanceKm} {t('kmUnit')} ({t('estDriveTime')})</span>
               <span>•</span>
-              <span>{formatDuration(routeSummary.totalDurationMinutes)}</span>
+              <span>~{formatDuration(routeSummary.totalDurationMinutes)}</span>
             </div>
           </div>
         </div>

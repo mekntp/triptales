@@ -1,12 +1,39 @@
-import type { Place } from '../types';
+import type { Place, Trip } from '../types';
 
-export const INITIAL_TRIP_INFO = {
-  id: 'phichit-2026',
-  name: 'Phichit Adventure',
-  subtitle: 'ตะลุยเมืองพิจิตร แดนพญาชาละวัน 2026',
-  description: 'ทริปครอบครัวขับรถเที่ยวพิจิตร แวะสถานีรถไฟสุดคลาสสิก ชมบึงสีไฟ ไหว้หลวงพ่อเพชร และตามล่าภาพถ่ายความทรงจำแสนสนุก',
-  coverImage: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80',
-};
+export const INITIAL_TRIPS: Trip[] = [
+  {
+    id: 'phichit-2026',
+    name: 'Phichit Adventure',
+    nameEn: 'Phichit Adventure',
+    nameZh: '披集探险之旅',
+    subtitle: 'ตะลุยเมืองพิจิตร แดนพญาชาละวัน 2026',
+    subtitleEn: 'Exploring Phichit & Legendary Chalawan 2026',
+    subtitleZh: '探访披集府与查拉万鳄鱼传说 2026',
+    description: 'ทริปครอบครัวขับรถเที่ยวพิจิตร แวะสถานีรถไฟสุดคลาสสิก ชมบึงสีไฟ ไหว้หลวงพ่อเพชร และตามล่าภาพถ่ายความทรงจำแสนสนุก',
+    descriptionEn: 'Family road trip exploring Phichit historic station, freshwater lake, revered temple, and exciting photo hunt missions.',
+    descriptionZh: '全家自驾畅游披集，打卡复古火车站、大型淡水湖与皇家佛寺，拍照记录温馨回忆。',
+    coverImage: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80',
+    createdAt: '2026-10-09T00:00:00.000Z',
+    updatedAt: '2026-10-09T00:00:00.000Z',
+  },
+  {
+    id: 'phitsanulok-2026',
+    name: 'Phitsanulok Discovery',
+    nameEn: 'Phitsanulok Discovery',
+    nameZh: '彭世洛探索之旅',
+    subtitle: 'ทริปพ่อลูกตะลุยเมืองสองแคว 2026',
+    subtitleEn: 'Father & Son Song Khwae Discovery 2026',
+    subtitleZh: '父子双河之城探索之旅 2026',
+    description: 'ทริปไหว้พระพุทธชินราช แวะดูของเล่นพื้นบ้าน จิบกาแฟริมแม่น้ำน่าน และเก็บภาพความทรงจำร่วมกัน',
+    descriptionEn: 'Heritage trip visiting Phra Buddha Chinnarat, traditional folk museum, Nan river cafe, and memories.',
+    descriptionZh: '朝圣成功佛金身佛像、探访民间玩具博物馆，记录父子温暖旅程。',
+    coverImage: 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=1200&q=80',
+    createdAt: '2026-10-09T00:00:00.000Z',
+    updatedAt: '2026-10-09T00:00:00.000Z',
+  },
+];
+
+export const INITIAL_TRIP_INFO = INITIAL_TRIPS[0];
 
 export const INITIAL_PLACES: Place[] = [
   {

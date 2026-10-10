@@ -99,6 +99,23 @@ export function calculateRouteSummary(places: Place[]): RouteSummary {
 }
 
 /**
+ * Generate Google Maps turn-by-turn driving directions URL for a single leg between two places
+ */
+export function generateGoogleMapsLegUrl(from: Place, to: Place): string {
+  const origin =
+    from.latitude !== undefined && from.longitude !== undefined
+      ? `${from.latitude},${from.longitude}`
+      : encodeURIComponent(from.name);
+
+  const destination =
+    to.latitude !== undefined && to.longitude !== undefined
+      ? `${to.latitude},${to.longitude}`
+      : encodeURIComponent(to.name);
+
+  return `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}&travelmode=driving`;
+}
+
+/**
  * Generate full Google Maps directions URL for an ordered list of places
  */
 export function generateGoogleMapsDirectionsUrl(places: Place[]): string {
@@ -106,7 +123,7 @@ export function generateGoogleMapsDirectionsUrl(places: Place[]): string {
   if (activePlaces.length === 0) return 'https://www.google.com/maps';
 
   const queryWaypoints = activePlaces.map((p) => {
-    if (p.latitude && p.longitude) {
+    if (p.latitude !== undefined && p.longitude !== undefined) {
       return `${p.latitude},${p.longitude}`;
     }
     return encodeURIComponent(p.name);

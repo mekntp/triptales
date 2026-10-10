@@ -21,6 +21,7 @@ import {
   calculateRouteSummary,
   estimateDrivingDistanceAndTime,
   optimizePlacesOrder,
+  generateGoogleMapsLegUrl,
 } from '../lib/route';
 import { useLanguage } from '../i18n/LanguageContext';
 
@@ -213,20 +214,22 @@ export const PlacesTab: React.FC<PlacesTabProps> = ({
 
           // Calculate leg to next place if available
           let nextLeg = null;
+          const nextPlace = !isLast ? places[index + 1] : null;
           if (
             !isLast &&
             !isSkipped &&
-            places[index + 1].status !== 'skipped' &&
+            nextPlace &&
+            nextPlace.status !== 'skipped' &&
             place.latitude &&
             place.longitude &&
-            places[index + 1].latitude &&
-            places[index + 1].longitude
+            nextPlace.latitude &&
+            nextPlace.longitude
           ) {
             nextLeg = estimateDrivingDistanceAndTime(
               place.latitude,
               place.longitude,
-              places[index + 1].latitude!,
-              places[index + 1].longitude!
+              nextPlace.latitude,
+              nextPlace.longitude
             );
           }
 
@@ -403,16 +406,23 @@ export const PlacesTab: React.FC<PlacesTabProps> = ({
                 </div>
               </div>
 
-              {/* Driving distance / time between this place and the next */}
-              {nextLeg && (
+              {/* Driving distance / time between this place and the next (interactive Google Maps link) */}
+              {nextLeg && nextPlace && (
                 <div className="flex items-center justify-center my-1.5 relative z-0">
-                  <div className="bg-amber-100/90 border border-amber-300 text-amber-900 rounded-full px-3 py-1 text-[11px] font-bold flex items-center gap-1.5 shadow-2xs">
+                  <a
+                    href={generateGoogleMapsLegUrl(place, nextPlace)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-amber-100 hover:bg-amber-200 border border-amber-300 text-amber-950 rounded-full px-3 py-1 text-[11px] font-bold flex items-center gap-1.5 shadow-2xs transition-all active:scale-95 cursor-pointer"
+                    title={t('openGoogleMaps')}
+                  >
                     <ArrowDown className="w-3 h-3 text-amber-600" />
-                    <span>{t('drive', { km: nextLeg.distanceKm, time: formatDuration(nextLeg.durationMinutes) })}</span>
+                    <span>~{nextLeg.distanceKm} {t('kmUnit')}</span>
                     <span>•</span>
                     <Clock className="w-3 h-3 text-amber-600" />
                     <span>~{formatDuration(nextLeg.durationMinutes)}</span>
-                  </div>
+                    <Navigation className="w-2.5 h-2.5 text-blue-600 ml-0.5" />
+                  </a>
                 </div>
               )}
             </div>

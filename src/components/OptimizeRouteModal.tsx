@@ -107,6 +107,12 @@ export const OptimizeRouteModal: React.FC<OptimizeRouteModalProps> = ({
             </div>
           )}
 
+          {/* Transparent Estimation Disclaimer */}
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-[10px] text-slate-500 leading-relaxed flex items-start gap-1.5">
+            <span className="shrink-0 text-slate-400">ℹ️</span>
+            <span>{t('routeEstDisclaimer')}</span>
+          </div>
+
           {/* Proposed Order List */}
           <div>
             <div className="font-bold text-slate-800 mb-2 flex items-center justify-between">

@@ -21,6 +21,8 @@ export interface Place {
   sortOrder: number;
   status: PlaceStatus;
   isFavoriteForKids?: boolean;
+  updatedAt?: string;
+  isDeleted?: boolean;
 }
 
 export interface PhotoItem {
@@ -29,6 +31,9 @@ export interface PhotoItem {
   storagePath?: string; // Supabase storage path
   url?: string; // Public URL
   createdAt: string;
+  updatedAt?: string;
+  isDeleted?: boolean;
+  uploadFailed?: boolean;
 }
 
 export interface PhotoMission {
@@ -47,11 +52,13 @@ export interface PhotoMission {
 
 export interface MissionState {
   missionId: number;
+  tripId?: string;
   completed: boolean;
   stars: number; // 0, 1, 2, 3
   photos: PhotoItem[]; // Support multiple photos per mission
   notes?: string;
   timestamp?: string;
+  updatedAt?: string;
 }
 
 export interface TripJournal {
@@ -63,12 +70,24 @@ export interface TripJournal {
   updatedAt: string;
 }
 
+export type SyncStatus = 'local_only' | 'syncing' | 'synced' | 'error' | 'offline';
+
 export interface Trip {
   id: string;
+  userId?: string;
   name: string;
+  nameEn?: string;
+  nameZh?: string;
   subtitle: string;
+  subtitleEn?: string;
+  subtitleZh?: string;
   description: string;
+  descriptionEn?: string;
+  descriptionZh?: string;
   coverImage?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  isDeleted?: boolean;
 }
 
 export interface RankInfo {
